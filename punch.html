@@ -14,7 +14,7 @@
       radial-gradient(ellipse at top, rgba(193,39,45,0.15), transparent 60%),
       linear-gradient(135deg, #1a0000 0%, #0a0a0a 50%, #1a0000 100%);
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
   }
   .punch-wrap {
     min-height: calc(100vh - 80px);
@@ -28,11 +28,11 @@
   }
   .punch-title {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
   }
   .punch-h1 {
     font-family: 'Bungee', sans-serif;
-    font-size: clamp(64px, 10vw, 110px);
+    font-size: clamp(56px, 9vw, 100px);
     color: var(--blood-bright);
     letter-spacing: 6px;
     line-height: 0.9;
@@ -49,24 +49,32 @@
   .punch-tag {
     color: var(--gold);
     font-family: 'Bungee', sans-serif;
-    font-size: 18px;
+    font-size: 16px;
     letter-spacing: 4px;
     margin-top: 8px;
     text-shadow: 2px 2px 0 var(--bg);
   }
+  .punch-counter {
+    color: var(--ink-dim);
+    font-family: 'Bungee', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    margin-top: 4px;
+  }
+  .punch-counter b { color: var(--gold); }
 
   .punch-button {
-    width: 360px;
-    height: 360px;
+    width: clamp(280px, 50vw, 360px);
+    height: clamp(280px, 50vw, 360px);
     border-radius: 50%;
     border: 8px solid #4a0000;
     color: white;
     font-family: 'Bungee', sans-serif;
-    font-size: 42px;
+    font-size: clamp(32px, 6vw, 42px);
     letter-spacing: 4px;
     cursor: pointer;
     user-select: none;
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.2s ease;
     background:
       radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 50%),
       linear-gradient(145deg, #ee0000, #aa0000);
@@ -97,6 +105,9 @@
     box-shadow:
       inset 8px 8px 20px rgba(0,0,0,0.6),
       0 0 60px rgba(255,0,0,1);
+  }
+  .punch-button.surprise {
+    filter: hue-rotate(40deg) saturate(2);
   }
   @keyframes idlePulse {
     0%, 100% { transform: scale(1); }
@@ -134,7 +145,7 @@
 
   .quote-display {
     position: absolute;
-    bottom: 100px;
+    bottom: 130px;
     left: 50%;
     transform: translateX(-50%);
     color: var(--gold);
@@ -149,6 +160,83 @@
     max-width: 80%;
   }
   .quote-display.show { opacity: 1; }
+  .quote-display .cat-tag {
+    display: block;
+    font-family: 'Bungee', sans-serif;
+    font-size: 11px;
+    color: var(--blood-bright);
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+
+  .history-strip {
+    position: fixed;
+    top: 90px;
+    left: 24px;
+    width: 240px;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .history-strip h4 {
+    font-family: 'Bungee', sans-serif;
+    color: var(--ink-dim);
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 4px;
+  }
+  .history-item {
+    background: rgba(20, 20, 20, 0.7);
+    border-left: 3px solid var(--blood);
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    font-size: 11px;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    animation: slideIn 0.3s ease;
+  }
+  .history-item .item-cat {
+    color: var(--gold);
+    font-family: 'Bungee', sans-serif;
+    font-size: 9px;
+    margin-right: 6px;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @media (max-width: 900px) {
+    .history-strip { display: none; }
+  }
+
+  .achievement {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-200%);
+    background: linear-gradient(135deg, var(--gold), #d49500);
+    color: var(--bg);
+    padding: 14px 28px;
+    z-index: 200;
+    font-family: 'Bungee', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 2px solid var(--bg);
+  }
+  .achievement.show { transform: translateX(-50%) translateY(0); }
+  .achievement .ach-sub {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    margin-top: 4px;
+    color: rgba(0,0,0,0.7);
+  }
 
   .footer-hint {
     position: fixed;
@@ -188,21 +276,26 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 12px;
+    gap: 10px;
     z-index: 5;
     flex-wrap: wrap;
     justify-content: center;
   }
 
-  body.shake-screen {
-    animation: screenShake 0.3s ease;
-  }
+  body.shake-screen { animation: screenShake 0.3s ease; }
   @keyframes screenShake {
     0%, 100% { transform: translate(0, 0); }
     20% { transform: translate(-4px, 2px); }
     40% { transform: translate(4px, -2px); }
     60% { transform: translate(-3px, -3px); }
     80% { transform: translate(3px, 3px); }
+  }
+
+  body.flash-burst { animation: flashBurst 0.4s ease; }
+  @keyframes flashBurst {
+    0% { background-color: transparent; }
+    25% { background-color: rgba(244,180,0,0.25); }
+    100% { background-color: transparent; }
   }
 </style>
 </head>
@@ -215,6 +308,9 @@
   <div class="punch-title">
     <div class="punch-h1">HELL YEAH</div>
     <div class="punch-tag">COME GET SOME</div>
+    <div class="punch-counter">
+      <span id="progressText"><b>0</b> / <b>0</b> CLIPS HEARD</span>
+    </div>
   </div>
 
   <button class="punch-button" id="punchBtn">
@@ -226,76 +322,120 @@
     <div class="combo-label">COMBO</div>
   </div>
 
-  <div class="quote-display" id="quoteDisplay"></div>
+  <div class="quote-display" id="quoteDisplay">
+    <span class="cat-tag" id="quoteCat"></span>
+    <span id="quoteText"></span>
+  </div>
 
   <div class="controls-bar">
-    <button class="duke-btn duke-btn-primary" id="categoryToggle">CATEGORY: CATCHPHRASE</button>
-    <button class="duke-btn" id="muteToggle">🔊 SOUND ON</button>
+    <button class="duke-btn duke-btn-primary" id="muteToggle">🔊 SOUND ON</button>
+    <button class="duke-btn" id="surpriseToggle">🎲 SURPRISES: ON</button>
+    <button class="duke-btn" id="resetBtn" title="Re-shuffle the queue and clear history">↻ RESET</button>
   </div>
 
 </div>
 
-<div class="footer-hint">DAMN, I'M GOOD · KEEP HITTING IT · BIGGER COMBOS = BIGGER REACTIONS</div>
+<div class="history-strip" id="historyStrip">
+  <h4>LAST 6 HITS</h4>
+  <div id="historyList"></div>
+</div>
+
+<div class="achievement" id="achievement">
+  <span id="achTitle">ACHIEVEMENT</span>
+  <span class="ach-sub" id="achSub">unlocked</span>
+</div>
+
+<div class="footer-hint">EVERY HIT PULLS A FRESH CLIP · NO REPEATS UNTIL THE QUEUE IS EXHAUSTED · SPACE OR CLICK</div>
 
 <div class="toast" id="toast"></div>
 
 <script src="assets/nav.js"></script>
 <script>
 (async function() {
+  // ============ ELEMENTS ============
   const btn = document.getElementById('punchBtn');
   const comboDisplay = document.getElementById('comboDisplay');
   const comboNum = document.getElementById('comboNum');
   const quoteDisplay = document.getElementById('quoteDisplay');
-  const categoryToggle = document.getElementById('categoryToggle');
+  const quoteCat = document.getElementById('quoteCat');
+  const quoteText = document.getElementById('quoteText');
   const muteToggle = document.getElementById('muteToggle');
+  const surpriseToggle = document.getElementById('surpriseToggle');
+  const resetBtn = document.getElementById('resetBtn');
+  const progressText = document.getElementById('progressText');
+  const historyList = document.getElementById('historyList');
+  const achievement = document.getElementById('achievement');
+  const achTitle = document.getElementById('achTitle');
+  const achSub = document.getElementById('achSub');
   const toast = document.getElementById('toast');
 
+  // ============ STATE ============
   let combo = 0;
   let comboTimer;
   let muted = false;
+  let surprisesEnabled = true;
   let manifest = null;
-  let availableCategories = [];
-  let currentCategoryIdx = 0;
-  let availableClips = [];
+  let allClips = [];
+  let queue = [];               // shuffled queue, popped one at a time
+  let heard = new Set();        // ids of clips played this session
+  let totalPunches = 0;
+  let history = [];             // last N played clips for the history strip
+  const HISTORY_LEN = 6;
+  const COLORS = ['#ff0000', '#ff6600', '#ffff00', '#ffffff', '#f4b400'];
 
-  function flash(msg, success) {
+  function flash(msg, ok) {
     toast.textContent = msg;
-    toast.classList.toggle('success', !!success);
+    toast.classList.toggle('success', !!ok);
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 2000);
   }
 
-  // Load manifest, default to "catchphrase" category
+  // ============ SHUFFLE (Fisher-Yates) ============
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function rebuildQueue() {
+    queue = shuffle(allClips);
+  }
+
+  // ============ LOAD MANIFEST ============
   try {
     manifest = await fetch('manifest.json').then(r => r.json());
-    availableCategories = ['catchphrase', 'combat', 'mockery', 'all'];
-    setCategory(0);
+    allClips = manifest.clips || [];
+    rebuildQueue();
+    updateProgress();
+    flash(`Loaded ${allClips.length} clips. Punch away.`, true);
   } catch (e) {
-    flash('Manifest not loaded — silent mode');
+    flash('Could not load clips manifest. Visuals only.');
   }
 
-  function setCategory(idx) {
-    currentCategoryIdx = idx % availableCategories.length;
-    const cat = availableCategories[currentCategoryIdx];
-    if (cat === 'all') {
-      availableClips = manifest.clips;
-    } else {
-      availableClips = manifest.clips.filter(c => c.category === cat);
+  function updateProgress() {
+    progressText.innerHTML = `<b>${heard.size}</b> / <b>${allClips.length}</b> CLIPS HEARD`;
+  }
+
+  // ============ NEXT CLIP — NO REPEATS ============
+  function nextClip() {
+    if (!allClips.length) return null;
+    if (queue.length === 0) {
+      // Cycle complete — celebrate, reshuffle, mark fresh
+      fireAchievement('FULL CYCLE COMPLETE', `Heard all ${allClips.length} clips. Reshuffling.`);
+      heard.clear();
+      rebuildQueue();
+      updateProgress();
     }
-    categoryToggle.textContent = `CATEGORY: ${cat.toUpperCase()} (${availableClips.length})`;
+    const clip = queue.pop();
+    heard.add(clip.id);
+    updateProgress();
+    return clip;
   }
 
-  categoryToggle.addEventListener('click', () => setCategory(currentCategoryIdx + 1));
-  muteToggle.addEventListener('click', () => {
-    muted = !muted;
-    muteToggle.textContent = muted ? '🔇 MUTED' : '🔊 SOUND ON';
-  });
-
-  function pickRandomClip() {
-    if (!availableClips.length) return null;
-    return availableClips[Math.floor(Math.random() * availableClips.length)];
-  }
-
+  // ============ PLAY ============
   function playClip(clip) {
     if (!clip || muted) return;
     const audio = new Audio(clip.path);
@@ -306,30 +446,48 @@
   function showQuote(clip) {
     if (!clip) return;
     const text = clip.title || clip.slug.replace(/-/g, ' ');
-    quoteDisplay.textContent = text.toUpperCase();
+    quoteCat.textContent = `[${clip.category.toUpperCase()}]`;
+    quoteText.textContent = text.toUpperCase();
     quoteDisplay.classList.add('show');
     clearTimeout(quoteDisplay._timer);
     quoteDisplay._timer = setTimeout(() => quoteDisplay.classList.remove('show'), 1800);
   }
 
-  function spawnParticles(x, y, count) {
-    const colors = ['#ff0000', '#ff6600', '#ffff00', '#ffffff'];
+  function pushHistory(clip) {
+    if (!clip) return;
+    history.unshift(clip);
+    if (history.length > HISTORY_LEN) history.pop();
+    historyList.innerHTML = history.map(c => `
+      <div class="history-item">
+        <span class="item-cat">${c.category.slice(0,3).toUpperCase()}</span>
+        ${escapeHTML(c.title || c.slug.replace(/-/g, ' '))}
+      </div>`).join('');
+  }
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ============ EFFECTS ============
+  function spawnParticles(x, y, count, scale) {
+    scale = scale || 1;
     for (let i = 0; i < count; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
       p.style.left = x + 'px';
       p.style.top = y + 'px';
-      p.style.background = `radial-gradient(circle, ${colors[i % colors.length]}, transparent)`;
+      p.style.background = `radial-gradient(circle, ${COLORS[i % COLORS.length]}, transparent)`;
+      p.style.width = (10 + Math.random() * 8 * scale) + 'px';
+      p.style.height = p.style.width;
       document.body.appendChild(p);
       const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
-      const distance = 100 + Math.random() * 150;
+      const distance = (80 + Math.random() * 180) * scale;
       const dx = Math.cos(angle) * distance;
       const dy = Math.sin(angle) * distance;
       p.animate([
         { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
         { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)`, opacity: 0 }
-      ], { duration: 700 + Math.random() * 400, easing: 'ease-out' });
-      setTimeout(() => p.remove(), 1100);
+      ], { duration: 700 + Math.random() * 500, easing: 'ease-out' });
+      setTimeout(() => p.remove(), 1300);
     }
   }
 
@@ -342,53 +500,141 @@
     setTimeout(() => sw.remove(), 700);
   }
 
-  btn.addEventListener('click', (e) => {
-    // Punch animation
+  // ============ ACHIEVEMENTS ============
+  function fireAchievement(title, sub) {
+    achTitle.textContent = title;
+    achSub.textContent = sub || '';
+    achievement.classList.add('show');
+    setTimeout(() => achievement.classList.remove('show'), 3200);
+  }
+
+  function checkAchievements(clip) {
+    // First hit
+    if (totalPunches === 1) fireAchievement('FIRST BLOOD', 'You hit it. Hell yeah.');
+    // Round numbers
+    if (totalPunches === 25) fireAchievement('25 HITS', 'Just getting warmed up.');
+    if (totalPunches === 100) fireAchievement('CENTURION', 'You really like this button.');
+    if (totalPunches === 500) fireAchievement('PUNCHING MACHINE', 'Concerning. Continue.');
+    if (totalPunches === 1000) fireAchievement('THE KING', 'You and Duke are now one.');
+    // Milestones based on heard count
+    if (heard.size === 50) fireAchievement('50 UNIQUE CLIPS', 'A respectable sample size.');
+    if (heard.size === 100) fireAchievement('CENTURY OF VOICES', 'You\'ve heard a lot of Duke.');
+    if (heard.size === Math.floor(allClips.length / 2)) {
+      fireAchievement('HALFWAY POINT', `${heard.size} of ${allClips.length} heard.`);
+    }
+    // Category-based
+    if (clip && clip.category === 'french') fireAchievement('SACRÉ BLEU', 'Found a French line.');
+    if (clip && clip.category === 'music') fireAchievement('A LITTLE MUSIC', 'Score moment.');
+    if (clip && clip.category === 'reference') fireAchievement('POP CULTURE', 'Duke is well-read.');
+  }
+
+  // ============ SURPRISES ============
+  // 1 in N punches triggers something extra. Returns the surprise type or null.
+  function rollSurprise() {
+    if (!surprisesEnabled) return null;
+    const r = Math.random();
+    if (r < 0.05) return 'mega';      // 5% — mega-particles + flash
+    if (r < 0.10) return 'doublehit';  // 5% — plays a second clip
+    if (r < 0.15) return 'rainbow';    // 5% — rainbow button tint
+    return null;
+  }
+
+  function applySurprise(type, x, y) {
+    if (type === 'mega') {
+      spawnParticles(x, y, 50, 1.6);
+      document.body.classList.add('flash-burst');
+      setTimeout(() => document.body.classList.remove('flash-burst'), 400);
+      flash('MEGA HIT!', true);
+    } else if (type === 'doublehit') {
+      // Second clip a moment later
+      setTimeout(() => {
+        const second = nextClip();
+        if (second) { playClip(second); showQuote(second); pushHistory(second); }
+      }, 350);
+      flash('DOUBLE HIT!', true);
+    } else if (type === 'rainbow') {
+      btn.classList.add('surprise');
+      setTimeout(() => btn.classList.remove('surprise'), 600);
+    }
+  }
+
+  // ============ MAIN PUNCH HANDLER ============
+  function doPunch() {
+    if (!allClips.length) return;
     btn.classList.add('punching');
     setTimeout(() => btn.classList.remove('punching'), 180);
 
-    // Pick clip and play
-    const clip = pickRandomClip();
-    playClip(clip);
-    showQuote(clip);
+    totalPunches++;
 
-    // Particles + shockwave at button center
+    const clip = nextClip();
+    if (clip) {
+      playClip(clip);
+      showQuote(clip);
+      pushHistory(clip);
+    }
+
     const rect = btn.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
     spawnParticles(cx, cy, 18);
     spawnShockwave(cx, cy);
 
-    // Combo
     combo++;
     comboNum.textContent = combo;
     comboDisplay.style.display = combo > 1 ? 'block' : 'none';
     comboDisplay.classList.add('bumped');
     setTimeout(() => comboDisplay.classList.remove('bumped'), 150);
 
-    // Bigger reaction at high combos
     if (combo >= 5) {
       document.body.classList.add('shake-screen');
       setTimeout(() => document.body.classList.remove('shake-screen'), 300);
     }
-    if (combo >= 10) {
-      // Bonus particles
-      spawnParticles(cx, cy, 36);
-    }
+    if (combo >= 10) spawnParticles(cx, cy, 30);
+    if (combo === 10) fireAchievement('10x COMBO', 'On fire.');
+    if (combo === 25) fireAchievement('25x COMBO', 'Legendary.');
+    if (combo === 50) fireAchievement('50x COMBO', 'You broke the meter.');
 
     clearTimeout(comboTimer);
     comboTimer = setTimeout(() => {
       combo = 0;
       comboDisplay.style.display = 'none';
     }, 2500);
+
+    // Surprises
+    const surprise = rollSurprise();
+    if (surprise) applySurprise(surprise, cx, cy);
+
+    checkAchievements(clip);
+  }
+
+  btn.addEventListener('click', doPunch);
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !e.target.matches('input, textarea, [contenteditable="true"]')) {
+      e.preventDefault();
+      doPunch();
+    }
   });
 
-  // Spacebar punches too
-  document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && !e.target.matches('input, textarea')) {
-      e.preventDefault();
-      btn.click();
-    }
+  // ============ CONTROLS ============
+  muteToggle.addEventListener('click', () => {
+    muted = !muted;
+    muteToggle.textContent = muted ? '🔇 MUTED' : '🔊 SOUND ON';
+  });
+
+  surpriseToggle.addEventListener('click', () => {
+    surprisesEnabled = !surprisesEnabled;
+    surpriseToggle.textContent = `🎲 SURPRISES: ${surprisesEnabled ? 'ON' : 'OFF'}`;
+  });
+
+  resetBtn.addEventListener('click', () => {
+    heard.clear();
+    history = [];
+    historyList.innerHTML = '';
+    rebuildQueue();
+    updateProgress();
+    combo = 0;
+    comboDisplay.style.display = 'none';
+    flash('Queue reshuffled. Fresh start.', true);
   });
 })();
 </script>
