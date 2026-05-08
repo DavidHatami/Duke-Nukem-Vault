@@ -291,6 +291,21 @@
     80% { transform: translate(3px, 3px); }
   }
 
+  .duke-btn.replaying {
+    background: var(--blood-bright) !important;
+    color: var(--ink) !important;
+    border-color: var(--blood-bright) !important;
+    animation: pulseRed 0.8s ease-in-out infinite;
+  }
+  @keyframes pulseRed {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(230,57,70,0.6); }
+    50% { box-shadow: 0 0 0 12px rgba(230,57,70,0); }
+  }
+  .duke-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
   body.flash-burst { animation: flashBurst 0.4s ease; }
   @keyframes flashBurst {
     0% { background-color: transparent; }
@@ -328,6 +343,7 @@
   </div>
 
   <div class="controls-bar">
+    <button class="duke-btn duke-btn-primary" id="replayBtn" disabled title="Replay the last clip (or press R)">↻ REPLAY LAST</button>
     <button class="duke-btn duke-btn-primary" id="muteToggle">🔊 SOUND ON</button>
     <button class="duke-btn" id="surpriseToggle">🎲 SURPRISES: ON</button>
     <button class="duke-btn" id="resetBtn" title="Re-shuffle the queue and clear history">↻ RESET</button>
@@ -345,7 +361,7 @@
   <span class="ach-sub" id="achSub">unlocked</span>
 </div>
 
-<div class="footer-hint">EVERY HIT PULLS A FRESH CLIP · NO REPEATS UNTIL THE QUEUE IS EXHAUSTED · SPACE OR CLICK</div>
+<div class="footer-hint">EVERY HIT PULLS A FRESH CLIP · NO REPEATS UNTIL THE QUEUE IS EXHAUSTED · SPACE OR CLICK · R TO REPLAY LAST</div>
 
 <div class="toast" id="toast"></div>
 
@@ -359,6 +375,7 @@
   const quoteDisplay = document.getElementById('quoteDisplay');
   const quoteCat = document.getElementById('quoteCat');
   const quoteText = document.getElementById('quoteText');
+  const replayBtn = document.getElementById('replayBtn');
   const muteToggle = document.getElementById('muteToggle');
   const surpriseToggle = document.getElementById('surpriseToggle');
   const resetBtn = document.getElementById('resetBtn');
@@ -380,6 +397,8 @@
   let heard = new Set();        // ids of clips played this session
   let totalPunches = 0;
   let history = [];             // last N played clips for the history strip
+  let lastClip = null;           // the most recent clip — what REPLAY plays
+  let currentAudio = null;       // currently playing Audio object (for replay control)
   const HISTORY_LEN = 6;
   const COLORS = ['#ff0000', '#ff6600', '#ffff00', '#ffffff', '#f4b400'];
 
@@ -438,9 +457,16 @@
   // ============ PLAY ============
   function playClip(clip) {
     if (!clip || muted) return;
-    const audio = new Audio(clip.path);
-    audio.volume = 0.85;
-    audio.play().catch(() => {});
+    // Stop any audio currently playing (e.g. mid-replay or mid-clip)
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+    lastClip = clip;
+    if (replayBtn) replayBtn.disabled = false;
+    currentAudio = new Audio(clip.path);
+    currentAudio.volume = 0.85;
+    currentAudio.play().catch(() => {});
   }
 
   function showQuote(clip) {
@@ -609,10 +635,43 @@
 
   btn.addEventListener('click', doPunch);
   document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && !e.target.matches('input, textarea, [contenteditable="true"]')) {
+    if (e.target.matches('input, textarea, [contenteditable="true"]')) return;
+    if (e.code === 'Space') {
       e.preventDefault();
       doPunch();
+    } else if (e.code === 'KeyR' && lastClip) {
+      e.preventDefault();
+      replayLast();
+    } else if (e.code === 'KeyM') {
+      e.preventDefault();
+      muteToggle.click();
     }
+  });
+
+  // ============ MANUAL REPLAY ============
+  function replayLast() {
+    if (!lastClip || muted) return;
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+    currentAudio = new Audio(lastClip.path);
+    currentAudio.volume = 0.85;
+    replayBtn.classList.add('replaying');
+    const originalText = replayBtn.textContent;
+    replayBtn.textContent = '▶ PLAYING';
+    currentAudio.addEventListener('ended', () => {
+      replayBtn.classList.remove('replaying');
+      replayBtn.textContent = originalText;
+    });
+    currentAudio.play().catch(() => {
+      replayBtn.classList.remove('replaying');
+      replayBtn.textContent = originalText;
+    });
+  }
+  replayBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    replayLast();
   });
 
   // ============ CONTROLS ============
