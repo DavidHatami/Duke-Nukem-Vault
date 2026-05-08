@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API — THE VAULT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=IBM+Plex+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/duke.css">
+<style>
+  .wrap { position: relative; z-index: 10; max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+  .header {
+    text-align: center;
+    padding: 20px 0 30px;
+    border-bottom: 3px solid var(--blood);
+    margin-bottom: 30px;
+  }
+  .header h1 {
+    font-family: 'Bungee', sans-serif;
+    color: var(--blood-bright);
+    font-size: clamp(40px, 7vw, 72px);
+    letter-spacing: 5px;
+    line-height: 0.95;
+    text-shadow: 4px 4px 0 var(--bg);
+  }
+  .header .tag {
+    font-family: 'Special Elite', cursive;
+    color: var(--gold);
+    font-size: 14px;
+    margin-top: 10px;
+    letter-spacing: 2px;
+  }
+  h2 {
+    font-family: 'Bungee', sans-serif;
+    color: var(--gold);
+    font-size: 18px;
+    letter-spacing: 3px;
+    margin: 32px 0 14px;
+    border-left: 6px solid var(--blood);
+    padding-left: 12px;
+  }
+  h3 {
+    color: var(--blood-bright);
+    font-family: 'Bungee', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    margin: 20px 0 10px;
+  }
+  p { color: var(--ink); line-height: 1.7; margin-bottom: 14px; font-size: 14px; }
+  .code-block {
+    background: var(--bg-2);
+    border: 2px solid var(--line);
+    border-left: 4px solid var(--gold);
+    padding: 16px 18px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    overflow-x: auto;
+    margin-bottom: 16px;
+    white-space: pre;
+    line-height: 1.5;
+  }
+  .code-block .k { color: var(--gold); }
+  .code-block .s { color: #f4b400; }
+  .code-block .c { color: var(--ink-dim); font-style: italic; }
+  .code-block .t { color: var(--blood-bright); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 18px;
+    font-size: 13px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  th {
+    background: var(--bg-2);
+    color: var(--gold);
+    font-family: 'Bungee', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+  }
+  td code {
+    background: var(--bg-2);
+    padding: 2px 6px;
+    color: var(--blood-bright);
+    font-size: 12px;
+  }
+  td:first-child { color: var(--ink); }
+  td:nth-child(2), td:nth-child(3) { color: var(--ink-dim); }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--ink-dim);
+    color: var(--ink-dim);
+    padding: 4px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-left: 10px;
+  }
+  .copy-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+  .note {
+    background: rgba(244,180,0,0.06);
+    border-left: 4px solid var(--gold);
+    padding: 12px 16px;
+    margin: 14px 0;
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .note strong { color: var(--gold); }
+</style>
+</head>
+<body>
+<script>window.__DUKE_PAGE__ = 'api';</script>
+
+<div class="wrap">
+
+  <div class="header">
+    <h1>API</h1>
+    <div class="tag">USE THE VAULT FROM YOUR OTHER PROJECTS</div>
+  </div>
+
+  <h2>OVERVIEW</h2>
+  <p>The Vault is a static site, but it's fully data-driven. Every clip's path is predictable, every clip's metadata is in <code style="color:var(--blood-bright)">manifest.json</code>, and the vault page itself accepts URL parameters for deep-linking from external apps. This page documents the contract.</p>
+
+  <div class="note">
+    <strong>NOTE:</strong> Once deployed to Netlify, replace the local paths below with your live URL (e.g., <code>https://duke-nukem-vault.netlify.app</code>). Netlify is configured with permissive CORS headers on <code>/audio/*</code> and <code>/manifest.json</code>, so you can hotlink directly from any other web project.
+  </div>
+
+  <h2>MANIFEST SCHEMA</h2>
+  <p>The single source of truth is <code>manifest.json</code>. It contains everything a client needs.</p>
+
+<div class="code-block">{
+  <span class="k">"version"</span>: <span class="t">1</span>,
+  <span class="k">"name"</span>: <span class="s">"Duke Nukem Audio Vault"</span>,
+  <span class="k">"total"</span>: <span class="t">285</span>,
+  <span class="k">"categories"</span>: [<span class="s">"catchphrase"</span>, <span class="s">"combat"</span>, <span class="s">"damage"</span>, ...],
+  <span class="k">"sources"</span>: [<span class="s">"Atomic Soundboard"</span>, <span class="s">"Ultimate Soundboard"</span>, ...],
+  <span class="k">"clips"</span>: [
+    {
+      <span class="k">"id"</span>: <span class="s">"clip_001"</span>,           <span class="c">// stable identifier</span>
+      <span class="k">"slug"</span>: <span class="s">"come-get-some"</span>,     <span class="c">// kebab-case URL-safe</span>
+      <span class="k">"title"</span>: <span class="s">"Come get some"</span>,    <span class="c">// human-readable</span>
+      <span class="k">"transcript"</span>: <span class="s">"Come get some"</span>,
+      <span class="k">"category"</span>: <span class="s">"catchphrase"</span>,    <span class="c">// 11 possible values</span>
+      <span class="k">"source"</span>: <span class="s">"Atomic Soundboard"</span>,
+      <span class="k">"source_key"</span>: <span class="s">"soundboard_atomic"</span>,
+      <span class="k">"path"</span>: <span class="s">"audio/catchphrase/come-get-some.mp3"</span>,
+      <span class="k">"filename"</span>: <span class="s">"come-get-some.mp3"</span>,
+      <span class="k">"type"</span>: <span class="s">"audio"</span>,
+      <span class="k">"size"</span>: <span class="t">23436</span>,                <span class="c">// bytes</span>
+      <span class="k">"format"</span>: <span class="s">"mp3"</span>
+    },
+    ...
+  ]
+}</div>
+
+  <h2>FETCH AND USE</h2>
+
+  <h3>JavaScript — vanilla browser</h3>
+<div class="code-block"><span class="k">const</span> VAULT = <span class="s">'https://your-vault.netlify.app'</span>;
+
+<span class="k">const</span> data = <span class="k">await</span> fetch(`${VAULT}/manifest.json`).then(r =&gt; r.json());
+
+<span class="c">// Random catchphrase on a button click</span>
+<span class="k">const</span> catchphrases = data.clips.filter(c =&gt; c.category === <span class="s">'catchphrase'</span>);
+button.addEventListener(<span class="s">'click'</span>, () =&gt; {
+  <span class="k">const</span> clip = catchphrases[Math.floor(Math.random() * catchphrases.length)];
+  <span class="k">new</span> Audio(`${VAULT}/${clip.path}`).play();
+});</div>
+
+  <h3>React component</h3>
+<div class="code-block"><span class="k">function</span> DukeButton({ category = <span class="s">'catchphrase'</span> }) {
+  <span class="k">const</span> [clips, setClips] = useState([]);
+
+  useEffect(() =&gt; {
+    fetch(<span class="s">'https://your-vault.netlify.app/manifest.json'</span>)
+      .then(r =&gt; r.json())
+      .then(d =&gt; setClips(d.clips.filter(c =&gt; c.category === category)));
+  }, [category]);
+
+  <span class="k">const</span> playRandom = () =&gt; {
+    <span class="k">const</span> clip = clips[Math.floor(Math.random() * clips.length)];
+    <span class="k">new</span> Audio(`https://your-vault.netlify.app/${clip.path}`).play();
+  };
+
+  <span class="k">return</span> &lt;button onClick={playRandom}&gt;Hell Yeah&lt;/button&gt;;
+}</div>
+
+  <h3>Direct embed — no JavaScript</h3>
+<div class="code-block">&lt;audio src=<span class="s">"https://your-vault.netlify.app/audio/catchphrase/come-get-some.mp3"</span> controls&gt;&lt;/audio&gt;</div>
+
+  <h2>DEEP LINK URL PARAMETERS</h2>
+  <p>The library page (<code>vault.html</code>) accepts these query parameters. Useful for opening the vault pre-filtered or auto-playing a specific clip from another app.</p>
+
+  <table>
+    <thead>
+      <tr><th>Parameter</th><th>Effect</th><th>Example</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>?clip=clip_001</code></td>
+        <td>Open vault, auto-play that clip</td>
+        <td><code>vault.html?clip=clip_005</code></td>
+      </tr>
+      <tr>
+        <td><code>?category=combat</code></td>
+        <td>Filter to a specific category</td>
+        <td><code>vault.html?category=catchphrase</code></td>
+      </tr>
+      <tr>
+        <td><code>?source=Atomic+Soundboard</code></td>
+        <td>Filter to a specific source</td>
+        <td><code>vault.html?source=Myinstants</code></td>
+      </tr>
+      <tr>
+        <td><code>?search=come+get</code></td>
+        <td>Pre-fill the search box</td>
+        <td><code>vault.html?search=hail+to+the+king</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Parameters can be combined: <code>vault.html?category=catchphrase&amp;search=king</code></p>
+
+  <h2>CATEGORIES (11 TOTAL)</h2>
+  <table>
+    <thead>
+      <tr><th>Category</th><th>Count</th><th>Examples</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>catchphrase</code></td><td>31</td><td>"Come get some", "Hail to the king, baby", "Balls of steel"</td></tr>
+      <tr><td><code>combat</code></td><td>50</td><td>"I'm gonna kick your ass", "Rip 'em a new one", "Die you SOB"</td></tr>
+      <tr><td><code>general</code></td><td>98</td><td>Mixed — first place to look for unique clips</td></tr>
+      <tr><td><code>greeting</code></td><td>41</td><td>"I love the smell of sewers", entry lines</td></tr>
+      <tr><td><code>french</code></td><td>16</td><td>French-language voice lines</td></tr>
+      <tr><td><code>sexual</code></td><td>13</td><td>"Shake it baby", strip club content</td></tr>
+      <tr><td><code>damage</code></td><td>12</td><td>Pain grunts, death sounds</td></tr>
+      <tr><td><code>mockery</code></td><td>9</td><td>"That's gotta hurt", "Damn you're ugly"</td></tr>
+      <tr><td><code>music</code></td><td>6</td><td>Theme variations, Grabbag riffs</td></tr>
+      <tr><td><code>reference</code></td><td>6</td><td>Pop culture nods (Clobberin' time, Indiana Jones)</td></tr>
+      <tr><td><code>idle</code></td><td>3</td><td>Humming, breathing, filler sounds</td></tr>
+    </tbody>
+  </table>
+
+  <h2>FILE PATHS</h2>
+  <p>All audio lives under <code>/audio/&lt;category&gt;/&lt;slug&gt;.mp3</code>. Predictable. URL-safe. Cached at the edge for one year on Netlify (<code>Cache-Control: public, max-age=31536000, immutable</code>).</p>
+
+  <h2>RATE LIMITS</h2>
+  <p>None. It's a static site on Netlify's CDN. Hammer it.</p>
+
+  <h2>VOICE FORGE — PROGRAMMATIC USE</h2>
+  <p>The Voice Forge logic is contained in <code>forge.html</code>. To replicate the word-stitching algorithm in another app:</p>
+
+<div class="code-block"><span class="c">// Build a word index from the manifest</span>
+<span class="k">const</span> wordIndex = <span class="k">new</span> Map();
+manifest.clips.forEach(clip =&gt; {
+  <span class="k">const</span> words = (clip.transcript || clip.title || <span class="s">''</span>)
+    .toLowerCase().match(/\b\w+\b/g) || [];
+  words.forEach(w =&gt; {
+    <span class="k">if</span> (!wordIndex.has(w)) wordIndex.set(w, []);
+    wordIndex.get(w).push({ clip, length: words.length });
+  });
+});
+
+<span class="c">// Find best clip for a word (shortest transcript = most isolated)</span>
+<span class="k">function</span> findClipForWord(word) {
+  <span class="k">const</span> matches = wordIndex.get(word.toLowerCase());
+  <span class="k">if</span> (!matches) <span class="k">return null</span>;
+  matches.sort((a, b) =&gt; a.length - b.length);
+  <span class="k">return</span> matches[<span class="t">0</span>].clip;
+}</div>
+
+  <h2>RIGHTS</h2>
+  <p>Duke Nukem is a registered trademark of Take-Two Interactive. Voice performances by Jon St. John. This API and the underlying audio are intended for personal, non-commercial fan use only. Don't ship a product that monetizes Duke without proper licensing.</p>
+
+</div>
+
+<script src="assets/nav.js"></script>
+</body>
+</html>

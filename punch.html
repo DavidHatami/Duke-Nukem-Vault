@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HELL YEAH — Punch Button — THE VAULT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=IBM+Plex+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/duke.css">
+<style>
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(193,39,45,0.15), transparent 60%),
+      linear-gradient(135deg, #1a0000 0%, #0a0a0a 50%, #1a0000 100%);
+    min-height: 100vh;
+    overflow: hidden;
+  }
+  .punch-wrap {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    z-index: 5;
+  }
+  .punch-title {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .punch-h1 {
+    font-family: 'Bungee', sans-serif;
+    font-size: clamp(64px, 10vw, 110px);
+    color: var(--blood-bright);
+    letter-spacing: 6px;
+    line-height: 0.9;
+    text-shadow:
+      0 0 30px rgba(255,0,0,0.6),
+      4px 4px 0 var(--bg),
+      -2px -2px 0 var(--bg);
+    animation: titlePulse 2s ease-in-out infinite;
+  }
+  @keyframes titlePulse {
+    0%, 100% { text-shadow: 0 0 30px rgba(255,0,0,0.6), 4px 4px 0 var(--bg), -2px -2px 0 var(--bg); }
+    50% { text-shadow: 0 0 50px rgba(255,0,0,0.9), 4px 4px 0 var(--bg), -2px -2px 0 var(--bg); }
+  }
+  .punch-tag {
+    color: var(--gold);
+    font-family: 'Bungee', sans-serif;
+    font-size: 18px;
+    letter-spacing: 4px;
+    margin-top: 8px;
+    text-shadow: 2px 2px 0 var(--bg);
+  }
+
+  .punch-button {
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    border: 8px solid #4a0000;
+    color: white;
+    font-family: 'Bungee', sans-serif;
+    font-size: 42px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 50%),
+      linear-gradient(145deg, #ee0000, #aa0000);
+    box-shadow:
+      14px 14px 28px rgba(0,0,0,0.7),
+      -10px -10px 24px rgba(255,80,80,0.15),
+      0 0 80px rgba(255,0,0,0.6),
+      inset 0 0 30px rgba(255,255,255,0.1);
+    text-shadow:
+      4px 4px 8px rgba(0,0,0,0.9),
+      0 0 20px rgba(255,255,0,0.4);
+    animation: idlePulse 2.5s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+  }
+  .punch-button:hover {
+    transform: scale(1.04);
+    box-shadow:
+      16px 16px 32px rgba(0,0,0,0.7),
+      0 0 100px rgba(255,0,0,0.8);
+  }
+  .punch-button.punching {
+    animation: shake 0.18s ease;
+    transform: scale(0.92);
+    background:
+      radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 50%),
+      linear-gradient(145deg, #aa0000, #770000);
+    box-shadow:
+      inset 8px 8px 20px rgba(0,0,0,0.6),
+      0 0 60px rgba(255,0,0,1);
+  }
+  @keyframes idlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.015); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0) scale(0.92); }
+    25% { transform: translate(-6px, 4px) scale(0.92) rotate(-1.5deg); }
+    75% { transform: translate(6px, -4px) scale(0.92) rotate(1.5deg); }
+  }
+
+  .combo-display {
+    position: absolute;
+    top: 30%;
+    right: 5%;
+    pointer-events: none;
+    text-align: right;
+  }
+  .combo-num {
+    font-family: 'Bungee', sans-serif;
+    font-size: 80px;
+    color: var(--gold);
+    text-shadow: 4px 4px 0 var(--bg), 0 0 30px rgba(244,180,0,0.6);
+    line-height: 0.9;
+    transform-origin: right center;
+    transition: transform 0.15s;
+  }
+  .combo-label {
+    font-family: 'Bungee', sans-serif;
+    font-size: 14px;
+    color: var(--blood-bright);
+    letter-spacing: 3px;
+  }
+  .combo-display.bumped .combo-num { transform: scale(1.3); }
+
+  .quote-display {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--gold);
+    font-family: 'Special Elite', cursive;
+    font-size: 22px;
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    max-width: 80%;
+  }
+  .quote-display.show { opacity: 1; }
+
+  .footer-hint {
+    position: fixed;
+    bottom: 16px;
+    width: 100%;
+    text-align: center;
+    color: var(--ink-dim);
+    font-size: 11px;
+    letter-spacing: 2px;
+    z-index: 5;
+  }
+
+  .particle {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .shockwave {
+    position: fixed;
+    border: 4px solid var(--blood-bright);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99;
+    animation: shockwaveExpand 0.6s ease-out forwards;
+  }
+  @keyframes shockwaveExpand {
+    0% { width: 0; height: 0; opacity: 1; transform: translate(-50%, -50%); }
+    100% { width: 600px; height: 600px; opacity: 0; transform: translate(-50%, -50%); }
+  }
+
+  .controls-bar {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 5;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  body.shake-screen {
+    animation: screenShake 0.3s ease;
+  }
+  @keyframes screenShake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-4px, 2px); }
+    40% { transform: translate(4px, -2px); }
+    60% { transform: translate(-3px, -3px); }
+    80% { transform: translate(3px, 3px); }
+  }
+</style>
+</head>
+<body>
+
+<script>window.__DUKE_PAGE__ = 'punch';</script>
+
+<div class="punch-wrap">
+
+  <div class="punch-title">
+    <div class="punch-h1">HELL YEAH</div>
+    <div class="punch-tag">COME GET SOME</div>
+  </div>
+
+  <button class="punch-button" id="punchBtn">
+    PUNCH<br>ME!
+  </button>
+
+  <div class="combo-display" id="comboDisplay" style="display:none;">
+    <div class="combo-num" id="comboNum">1</div>
+    <div class="combo-label">COMBO</div>
+  </div>
+
+  <div class="quote-display" id="quoteDisplay"></div>
+
+  <div class="controls-bar">
+    <button class="duke-btn duke-btn-primary" id="categoryToggle">CATEGORY: CATCHPHRASE</button>
+    <button class="duke-btn" id="muteToggle">🔊 SOUND ON</button>
+  </div>
+
+</div>
+
+<div class="footer-hint">DAMN, I'M GOOD · KEEP HITTING IT · BIGGER COMBOS = BIGGER REACTIONS</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/nav.js"></script>
+<script>
+(async function() {
+  const btn = document.getElementById('punchBtn');
+  const comboDisplay = document.getElementById('comboDisplay');
+  const comboNum = document.getElementById('comboNum');
+  const quoteDisplay = document.getElementById('quoteDisplay');
+  const categoryToggle = document.getElementById('categoryToggle');
+  const muteToggle = document.getElementById('muteToggle');
+  const toast = document.getElementById('toast');
+
+  let combo = 0;
+  let comboTimer;
+  let muted = false;
+  let manifest = null;
+  let availableCategories = [];
+  let currentCategoryIdx = 0;
+  let availableClips = [];
+
+  function flash(msg, success) {
+    toast.textContent = msg;
+    toast.classList.toggle('success', !!success);
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  // Load manifest, default to "catchphrase" category
+  try {
+    manifest = await fetch('manifest.json').then(r => r.json());
+    availableCategories = ['catchphrase', 'combat', 'mockery', 'all'];
+    setCategory(0);
+  } catch (e) {
+    flash('Manifest not loaded — silent mode');
+  }
+
+  function setCategory(idx) {
+    currentCategoryIdx = idx % availableCategories.length;
+    const cat = availableCategories[currentCategoryIdx];
+    if (cat === 'all') {
+      availableClips = manifest.clips;
+    } else {
+      availableClips = manifest.clips.filter(c => c.category === cat);
+    }
+    categoryToggle.textContent = `CATEGORY: ${cat.toUpperCase()} (${availableClips.length})`;
+  }
+
+  categoryToggle.addEventListener('click', () => setCategory(currentCategoryIdx + 1));
+  muteToggle.addEventListener('click', () => {
+    muted = !muted;
+    muteToggle.textContent = muted ? '🔇 MUTED' : '🔊 SOUND ON';
+  });
+
+  function pickRandomClip() {
+    if (!availableClips.length) return null;
+    return availableClips[Math.floor(Math.random() * availableClips.length)];
+  }
+
+  function playClip(clip) {
+    if (!clip || muted) return;
+    const audio = new Audio(clip.path);
+    audio.volume = 0.85;
+    audio.play().catch(() => {});
+  }
+
+  function showQuote(clip) {
+    if (!clip) return;
+    const text = clip.title || clip.slug.replace(/-/g, ' ');
+    quoteDisplay.textContent = text.toUpperCase();
+    quoteDisplay.classList.add('show');
+    clearTimeout(quoteDisplay._timer);
+    quoteDisplay._timer = setTimeout(() => quoteDisplay.classList.remove('show'), 1800);
+  }
+
+  function spawnParticles(x, y, count) {
+    const colors = ['#ff0000', '#ff6600', '#ffff00', '#ffffff'];
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = x + 'px';
+      p.style.top = y + 'px';
+      p.style.background = `radial-gradient(circle, ${colors[i % colors.length]}, transparent)`;
+      document.body.appendChild(p);
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+      const distance = 100 + Math.random() * 150;
+      const dx = Math.cos(angle) * distance;
+      const dy = Math.sin(angle) * distance;
+      p.animate([
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0)`, opacity: 0 }
+      ], { duration: 700 + Math.random() * 400, easing: 'ease-out' });
+      setTimeout(() => p.remove(), 1100);
+    }
+  }
+
+  function spawnShockwave(x, y) {
+    const sw = document.createElement('div');
+    sw.className = 'shockwave';
+    sw.style.left = x + 'px';
+    sw.style.top = y + 'px';
+    document.body.appendChild(sw);
+    setTimeout(() => sw.remove(), 700);
+  }
+
+  btn.addEventListener('click', (e) => {
+    // Punch animation
+    btn.classList.add('punching');
+    setTimeout(() => btn.classList.remove('punching'), 180);
+
+    // Pick clip and play
+    const clip = pickRandomClip();
+    playClip(clip);
+    showQuote(clip);
+
+    // Particles + shockwave at button center
+    const rect = btn.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    spawnParticles(cx, cy, 18);
+    spawnShockwave(cx, cy);
+
+    // Combo
+    combo++;
+    comboNum.textContent = combo;
+    comboDisplay.style.display = combo > 1 ? 'block' : 'none';
+    comboDisplay.classList.add('bumped');
+    setTimeout(() => comboDisplay.classList.remove('bumped'), 150);
+
+    // Bigger reaction at high combos
+    if (combo >= 5) {
+      document.body.classList.add('shake-screen');
+      setTimeout(() => document.body.classList.remove('shake-screen'), 300);
+    }
+    if (combo >= 10) {
+      // Bonus particles
+      spawnParticles(cx, cy, 36);
+    }
+
+    clearTimeout(comboTimer);
+    comboTimer = setTimeout(() => {
+      combo = 0;
+      comboDisplay.style.display = 'none';
+    }, 2500);
+  });
+
+  // Spacebar punches too
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !e.target.matches('input, textarea')) {
+      e.preventDefault();
+      btn.click();
+    }
+  });
+})();
+</script>
+</body>
+</html>

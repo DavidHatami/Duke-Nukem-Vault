@@ -1,10 +1,52 @@
-# THE VAULT — Duke Nukem Audio Repository
+# THE VAULT — Duke Nukem Audio Site
 
-A standalone, browser-based audio repository pre-loaded with **285 Duke Nukem voice clips and sound effects**, organized by category, fully searchable, and ready to drop into any other project.
+A complete Duke Nukem audio toolkit. Browser-based. No install. **285 voice clips**, a **voice forge** that builds custom phrases from Duke's actual recordings, a **Hell Yeah punch button**, and a **public API** for use in other projects.
 
 ![Static](https://img.shields.io/badge/type-Static_site-141414?style=for-the-badge)
 ![No build](https://img.shields.io/badge/build-None-f4b400?style=for-the-badge)
 ![Style](https://img.shields.io/badge/aesthetic-Duke_Nukem-c1272d?style=for-the-badge)
+![Pages](https://img.shields.io/badge/pages-5-e63946?style=for-the-badge)
+
+---
+
+## What's in here
+
+| Page | What it does | File |
+|------|--------------|------|
+| **HOME** | Landing page, top catchphrases, random picks, links to everything | `index.html` |
+| **LIBRARY** | Full 285-clip browser with search, filter, tags, embed, bulk download | `vault.html` |
+| **VOICE FORGE** | Type text → Duke says it (using his actual clips). Export as WAV | `forge.html` |
+| **PUNCH** | Hell Yeah button. Catharsis with combo counter and screen shake | `punch.html` |
+| **API** | Manifest schema, fetch examples, deep-link URL params | `api.html` |
+
+```
+Duke-Nukem-Vault/
+├── index.html          # Home / landing page
+├── vault.html          # The library browser
+├── forge.html          # Voice Forge — text-to-Duke
+├── punch.html          # Hell Yeah punch button
+├── api.html            # API documentation
+├── manifest.json       # All clip metadata
+├── netlify.toml        # Netlify config (redirects, headers, caching)
+├── README.md           # This file
+├── assets/
+│   ├── duke.css        # Shared styling, nav, theme
+│   └── nav.js          # Shared navigation injector
+└── audio/
+    ├── catchphrase/    # 31 — "Come get some", "Hail to the king"
+    ├── combat/         # 50 — kicks, kills, threats
+    ├── damage/         # 12 — pain grunts, death sounds
+    ├── french/         # 16 — French-language voice lines
+    ├── general/        # 98 — uncategorized, mixed content
+    ├── greeting/       # 41 — entrances, openers
+    ├── idle/           #  3 — humming, breathing
+    ├── mockery/        #  9 — taunts, insults
+    ├── music/          #  6 — themes, riffs
+    ├── reference/      #  6 — pop culture nods
+    └── sexual/         # 13 — strip club, "shake it baby"
+```
+
+**285 audio files. ~10 MB. All MP3. Filenames normalized to lowercase kebab-case.**
 
 ---
 
@@ -15,127 +57,45 @@ git clone https://github.com/DavidHatami/Duke-Nukem-Vault.git
 cd Duke-Nukem-Vault
 ```
 
-Then either:
+**Open locally:** Double-click `index.html`. For Chrome strict file:// rules, run `python3 -m http.server 8000` and visit `http://localhost:8000`.
 
-- **Open locally:** Double-click `vault.html`. Most browsers work directly. If clips don't auto-load (Chrome with strict file:// rules), run `python3 -m http.server 8000` in the folder and visit `http://localhost:8000/vault.html`.
-- **Deploy to Netlify:** Connect this repo in Netlify's dashboard. The included `netlify.toml` handles everything. Live URL in 30 seconds.
-
----
-
-## Structure
-
-```
-Duke-Nukem-Vault/
-├── vault.html          # The player app
-├── manifest.json       # Clip metadata (categories, tags, paths, transcripts)
-├── netlify.toml        # Netlify deployment config
-├── README.md           # This file
-├── .gitignore
-└── audio/
-    ├── catchphrase/    # 31 clips — "Come get some", "Hail to the king", etc.
-    ├── combat/         # 50 clips — kicks, kills, threats
-    ├── damage/         # 12 clips — taking hits, death sounds
-    ├── french/         # 16 clips — French-language voice lines
-    ├── general/        # 98 clips — uncategorized, mixed content
-    ├── greeting/       # 41 clips — entrances, openers
-    ├── idle/           #  3 clips — humming, breathing
-    ├── mockery/        #  9 clips — taunts, insults
-    ├── music/          #  6 clips — themes, riffs
-    ├── reference/      #  6 clips — pop culture nods
-    └── sexual/         # 13 clips — strip club, "shake it baby"
-```
-
-**Filenames are normalized:** lowercase kebab-case, descriptive (e.g., `come-get-some.mp3`, not `duke-nukem-3d-come-get-some-22.mp3`). Duplicates across collections get a suffix (`come-get-some-2.mp3`).
+**Deploy to Netlify:** Connect this repo in Netlify. The `netlify.toml` handles everything. Live in 30 seconds.
 
 ---
 
-## What the vault does
+## VOICE FORGE — what it actually does
 
-### Search and filter
+The honest version: this is **not AI voice cloning**. It's intelligent reuse of Duke's actual recorded clips.
 
-- Search box matches title, transcript, slug, source, category, and tags
-- Category buttons (catchphrase, combat, etc.)
-- Source buttons (which soundboard the clip came from)
-- Audio/video type toggle
+### Four modes
 
-### Playback
+**1. Find Match** — type a phrase, the forge searches all 285 transcripts for clips that match. Real Duke voice. Best for finding existing lines or close variants.
 
-- Click **▶ PLAY** on any card
-- **SPACE** pauses/resumes
-- **←** / **→** previous/next clip in the current filtered view
-- **ESC** closes the player
-- Auto-advance to next clip when one finishes
+**2. Stitch Words** — type any text, the forge breaks it into words, finds the shortest clip containing each word, concatenates them into a single audio output. Words missing from the corpus get a brief placeholder. Export the result as WAV.
 
-### Tagging
+**3. Sequence Builder** — manually arrange clips into custom phrases. Click clips to add. Drag to reorder. Play. Export as WAV.
 
-- Click **+ tag** on any clip to add a custom tag (`favorite`, `for-podcast`, `episode-3`, whatever)
-- Tags persist via `localStorage`
-- Click an existing tag to remove it
-- **⬇ Export Tags** dumps your tag library as JSON
+**4. Synth Only** — browser speech synthesis tuned for low pitch and slower rate. NOT Duke's voice — it's the OS male voice. Useful as a quick fallback for words that don't exist in the corpus.
 
-### Bulk operations
+### Why no real voice cloning?
 
-- Checkbox on each card to select clips
-- Selection bar at top: download all selected at once
-- "Download Category" button on each category section
-- "Select All" within a category
+True voice cloning (type any text → Duke says it in his actual voice) requires either:
+- A neural model running server-side (gigabytes, not browser-feasible)
+- A paid API like ElevenLabs (separate integration, costs money per character)
 
-### Embed in other projects
-
-- **&lt;/&gt;** button on each card opens an embed dialog with:
-  - **Direct URL** to the MP3 file
-  - **HTML snippet** — `<audio>` tag ready to paste
-  - **JavaScript snippet** — `new Audio(url).play()` for event-driven use
-  - **Vault deep link** — opens the vault filtered to that clip
-
-### Drop new files
-
-- Drag-drop additional MP3/MP4 files into the red zone at top
-- Session-only (no server, files don't persist) but useful for one-off needs
+If you want that later, layer ElevenLabs on top of this site by adding a Netlify Function that takes text + your API key and returns the audio.
 
 ---
 
 ## API — using the vault from other projects
 
-The vault is data-driven. Other projects can consume `manifest.json` directly.
-
-### Manifest schema
-
-```json
-{
-  "version": 1,
-  "name": "Duke Nukem Audio Vault",
-  "total": 285,
-  "categories": ["catchphrase", "combat", "damage", "french", ...],
-  "sources": ["Atomic Soundboard", "Ultimate Soundboard", ...],
-  "clips": [
-    {
-      "id": "clip_001",
-      "slug": "come-get-some",
-      "title": "Come get some",
-      "transcript": "Come get some",
-      "category": "catchphrase",
-      "source": "Atomic Soundboard",
-      "source_key": "soundboard_atomic",
-      "path": "audio/catchphrase/come-get-some.mp3",
-      "filename": "come-get-some.mp3",
-      "type": "audio",
-      "size": 23436,
-      "format": "mp3"
-    }
-  ]
-}
-```
-
-### Use in another web project
+See [`api.html`](api.html) for the full docs. Quick version:
 
 ```javascript
-// Once deployed to Netlify, replace with your vault URL:
 const VAULT = 'https://your-vault.netlify.app';
-
 const data = await fetch(`${VAULT}/manifest.json`).then(r => r.json());
 
-// Random catchphrase on button click
+// Random catchphrase on a button click
 const catchphrases = data.clips.filter(c => c.category === 'catchphrase');
 button.addEventListener('click', () => {
   const clip = catchphrases[Math.floor(Math.random() * catchphrases.length)];
@@ -143,46 +103,35 @@ button.addEventListener('click', () => {
 });
 ```
 
-### Deep-link URL parameters
-
-The vault accepts URL params for direct linking from other apps:
-
-| Parameter | Effect |
-|-----------|--------|
-| `?clip=clip_001` | Open vault, auto-play that clip |
-| `?category=combat` | Open vault, filter to combat category |
-| `?source=Atomic+Soundboard` | Open vault, filter to that source |
-| `?search=come+get+some` | Open vault with search pre-filled |
-
-Combine: `?category=catchphrase&search=king`
-
-### CORS and direct-embed
-
-When deployed on Netlify, the audio files are served with proper CORS headers and aggressive caching (set in `netlify.toml`). Other web projects can hotlink the MP3s directly:
+### Direct hotlink
 
 ```html
 <audio src="https://your-vault.netlify.app/audio/catchphrase/come-get-some.mp3" controls></audio>
 ```
 
----
+CORS is wide open on `/audio/*` and `/manifest.json` per `netlify.toml`. Pull from anywhere.
 
-## Categories explained
+### Deep-link URL params
 
-| Category | Examples | Count |
-|----------|----------|-------|
-| `catchphrase` | "Come get some", "Hail to the king, baby", "Balls of steel" | 31 |
-| `combat` | "I'm gonna kick your ass", "Rip 'em a new one", "Die you SOB" | 50 |
-| `damage` | Pain grunts, death sounds, "Damn that was annoying" | 12 |
-| `french` | French-language voice lines (community-recorded) | 16 |
-| `general` | Uncategorized — first place to look for unique clips | 98 |
-| `greeting` | "I love the smell of sewers", "All aboard", entry lines | 41 |
-| `idle` | Humming, breathing, "Egh", filler sounds | 3 |
-| `mockery` | "That's gotta hurt", "Damn you're ugly" | 9 |
-| `music` | Theme variations, Grabbag riffs | 6 |
-| `reference` | "It's clobberin' time", Indiana Jones nod, etc. | 6 |
-| `sexual` | "Shake it baby", strip club content | 13 |
+| Parameter | Effect |
+|-----------|--------|
+| `?clip=clip_001` | Open vault, auto-play that clip |
+| `?category=combat` | Filter to a category |
+| `?source=Atomic+Soundboard` | Filter to a source |
+| `?search=come+get+some` | Pre-fill search |
 
-The categorization is heuristic — based on filename keywords. You can refine via the tag system inside the vault.
+Combine: `?category=catchphrase&search=king`
+
+### Pretty redirects (Netlify only)
+
+The `netlify.toml` adds these clean URLs once deployed:
+
+| URL | Page |
+|-----|------|
+| `/library` | `vault.html` |
+| `/forge` | `forge.html` |
+| `/punch` | `punch.html` |
+| `/api` | `api.html` |
 
 ---
 
@@ -191,44 +140,43 @@ The categorization is heuristic — based on filename keywords. You can refine v
 | Item | Storage | Survives refresh? |
 |------|---------|-------------------|
 | 285 pre-loaded clips | Repo files | Always |
-| Renamed titles | `localStorage` (per device, per browser) | Yes |
-| User-added tags | `localStorage` (per device, per browser) | Yes |
-| Drag-dropped session files | Browser memory (blob URLs) | No — re-drop required |
+| Renamed clip titles | `localStorage` | Yes (per device) |
+| Custom tags | `localStorage` | Yes (per device) |
+| Voice Forge sequences | Session memory | No — rebuild required |
+| Drag-dropped session files | Browser blob URLs | No |
 
 ---
 
 ## Browser support
 
-- ✅ Chrome / Edge (Chromium) — perfect when served via HTTP/HTTPS, may need flag for file:// access
+- ✅ Chrome / Edge — works on HTTPS deploy, may need flag for file:// access
 - ✅ Firefox — works on both file:// and HTTPS without flags
 - ✅ Safari (desktop and iOS) — works on both
-- ⚠️ Older mobile browsers — untested; modern WebKit/Blink/Gecko recommended
+- ⚠️ Voice Forge requires Web Audio API (all modern browsers, IE11 not supported)
+- ⚠️ Speech synthesis quality varies by OS — Safari/macOS has the best male voices
 
 ---
 
 ## Sources
 
-The 285 clips were collected from publicly accessible soundboard sites that have hosted Duke Nukem voice samples for 15+ years:
-
-- [Myinstants.com](https://www.myinstants.com)
-- [Soundboard.com — Atomic Duke Nukem](https://www.soundboard.com/sb/maxalo)
-- [Soundboard.com — Ultimate Duke Nukem](https://www.soundboard.com/sb/solrosin)
-- [Soundboard.com — Jamie's board](https://www.soundboard.com/sb/xXJamieXx)
+- [Myinstants.com](https://www.myinstants.com) — 44 clips
+- [Soundboard.com — Atomic](https://www.soundboard.com/sb/maxalo) — 167 clips
+- [Soundboard.com — Ultimate](https://www.soundboard.com/sb/solrosin) — 58 clips
+- [Soundboard.com — Jamie's](https://www.soundboard.com/sb/xXJamieXx) — 16 clips
 
 ---
 
 ## Credits & rights
 
-Duke Nukem is a registered trademark of **Take-Two Interactive** (which acquired Gearbox Software in March 2024). Voice performances by **Jon St. John** since *Duke Nukem 3D* (1996). Original score by **Lee Jackson** and **Bobby Prince**.
+Duke Nukem is a registered trademark of **Take-Two Interactive** (acquired Gearbox Software March 2024). Voice performances by **Jon St. John** since *Duke Nukem 3D* (1996). Original score by **Lee Jackson** and **Bobby Prince**.
 
-This repository is a personal fan archive for non-commercial use. If a rights-holder objects, files will be removed on request.
+This repository is a personal fan archive for **non-commercial use only**. If a rights-holder objects, files will be removed on request.
 
 ---
 
-## Roadmap (potential next phases)
+## Roadmap
 
-- Backend version with **Supabase Storage + Postgres** for shared tags across users and devices
-- User accounts via **Supabase Auth**
-- Public sharable playlists
-- WebRTC-based "Duke Says" multiplayer game using the clip library
+- ElevenLabs integration for true text-to-Duke AI voice (Netlify Function with API key)
+- Backend version with Supabase Storage + Postgres for shared tags across users
+- Public sharable Voice Forge sequences via URL hash
 - Browser extension that injects Duke clips into other web pages

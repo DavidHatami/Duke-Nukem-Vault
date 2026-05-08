@@ -23,7 +23,27 @@
     Cache-Control = "public, max-age=300"
     Access-Control-Allow-Origin = "*"
 
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
 [[redirects]]
-  from = "/"
+  from = "/library"
   to = "/vault.html"
+  status = 200
+
+[[redirects]]
+  from = "/forge"
+  to = "/forge.html"
+  status = 200
+
+[[redirects]]
+  from = "/punch"
+  to = "/punch.html"
+  status = 200
+
+[[redirects]]
+  from = "/api"
+  to = "/api.html"
   status = 200

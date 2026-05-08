@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOICE FORGE — Type → Duke Audio → WAV — THE VAULT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=IBM+Plex+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/duke.css">
+<style>
+  .wrap {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+  .forge-header {
+    text-align: center;
+    padding: 20px 0 30px;
+    border-bottom: 3px solid var(--blood);
+    margin-bottom: 30px;
+  }
+  .forge-title {
+    font-family: 'Bungee', sans-serif;
+    font-size: clamp(40px, 7vw, 72px);
+    color: var(--blood-bright);
+    letter-spacing: 5px;
+    text-shadow: 4px 4px 0 var(--bg), 0 0 30px rgba(193,39,45,0.4);
+    line-height: 0.95;
+  }
+  .forge-tag {
+    font-family: 'Special Elite', cursive;
+    color: var(--gold);
+    font-size: 15px;
+    margin-top: 10px;
+    letter-spacing: 2px;
+  }
+
+  .honesty-box {
+    background: rgba(244,180,0,0.08);
+    border: 2px solid var(--gold);
+    border-left-width: 6px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .honesty-box strong { color: var(--gold); font-family: 'Bungee', sans-serif; letter-spacing: 1px; }
+
+  .mode-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+  }
+  .mode-tab {
+    background: var(--bg-2);
+    border: 2px solid var(--line);
+    border-bottom: none;
+    color: var(--ink-dim);
+    padding: 12px 20px;
+    cursor: pointer;
+    font-family: 'Bungee', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    transition: all 0.15s;
+  }
+  .mode-tab:hover { color: var(--ink); }
+  .mode-tab.active {
+    background: var(--blood);
+    color: var(--ink);
+    border-color: var(--blood);
+  }
+
+  .mode-panel {
+    background: var(--bg-2);
+    border: 2px solid var(--blood);
+    padding: 24px;
+    margin-bottom: 28px;
+  }
+  .mode-panel h3 {
+    font-family: 'Bungee', sans-serif;
+    color: var(--gold);
+    font-size: 16px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  .mode-desc {
+    color: var(--ink-dim);
+    font-size: 12px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+
+  .text-input-area {
+    background: var(--bg);
+    border: 2px solid var(--line);
+    color: var(--ink);
+    width: 100%;
+    padding: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 16px;
+    min-height: 100px;
+    resize: vertical;
+    margin-bottom: 16px;
+  }
+  .text-input-area:focus { outline: none; border-color: var(--gold); }
+
+  .action-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .big-btn {
+    background: var(--blood);
+    color: var(--ink);
+    border: 2px solid var(--blood);
+    padding: 12px 24px;
+    font-family: 'Bungee', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .big-btn:hover:not(:disabled) {
+    background: var(--blood-bright);
+    border-color: var(--blood-bright);
+  }
+  .big-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .big-btn.gold {
+    background: var(--gold);
+    color: var(--bg);
+    border-color: var(--gold);
+  }
+  .big-btn.gold:hover:not(:disabled) {
+    background: #ffc933;
+    border-color: #ffc933;
+  }
+  .big-btn.outline {
+    background: transparent;
+    color: var(--ink-dim);
+    border-color: var(--ink-dim);
+  }
+  .big-btn.outline:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  /* RESULTS PANEL */
+  .results-area {
+    background: var(--bg-3);
+    border: 2px solid var(--line);
+    padding: 16px;
+    min-height: 60px;
+    margin-bottom: 16px;
+  }
+  .results-empty {
+    color: var(--ink-dim);
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  /* MATCH RESULTS */
+  .match {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .match:last-child { border-bottom: none; }
+  .match-score {
+    font-family: 'Bungee', sans-serif;
+    color: var(--gold);
+    font-size: 13px;
+    min-width: 40px;
+    text-align: right;
+  }
+  .match-info { flex: 1; min-width: 0; }
+  .match-title {
+    color: var(--ink);
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 3px;
+  }
+  .match-meta {
+    color: var(--ink-dim);
+    font-size: 11px;
+  }
+  .match-actions { display: flex; gap: 6px; }
+  .mini-btn {
+    background: transparent;
+    border: 1px solid var(--ink-dim);
+    color: var(--ink-dim);
+    padding: 4px 10px;
+    font-family: inherit;
+    font-size: 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .mini-btn:hover { color: var(--gold); border-color: var(--gold); }
+  .mini-btn.primary { color: var(--gold); border-color: var(--gold); }
+
+  /* WORD STITCH BREAKDOWN */
+  .word-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .word-token {
+    padding: 8px 12px;
+    border: 2px solid var(--line);
+    background: var(--bg);
+    font-size: 12px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 80px;
+  }
+  .word-token.found {
+    border-color: var(--gold);
+    background: rgba(244,180,0,0.06);
+  }
+  .word-token.missing {
+    border-color: var(--rust);
+    background: rgba(107,52,16,0.15);
+  }
+  .word-token .word {
+    font-family: 'Bungee', sans-serif;
+    color: var(--ink);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  .word-token .source {
+    color: var(--ink-dim);
+    font-size: 10px;
+  }
+  .word-token .badge {
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+  .word-token.missing .badge { color: var(--blood-bright); }
+
+  /* SEQUENCE BUILDER */
+  .builder-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 800px) {
+    .builder-grid { grid-template-columns: 1fr; }
+  }
+  .builder-section h4 {
+    font-family: 'Bungee', sans-serif;
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .builder-search {
+    background: var(--bg);
+    border: 2px solid var(--line);
+    color: var(--ink);
+    padding: 8px 12px;
+    width: 100%;
+    margin-bottom: 8px;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  .builder-search:focus { outline: none; border-color: var(--gold); }
+
+  .clip-pool, .sequence-list {
+    background: var(--bg-3);
+    border: 2px solid var(--line);
+    padding: 8px;
+    height: 320px;
+    overflow-y: auto;
+  }
+  .clip-item {
+    padding: 8px 10px;
+    margin-bottom: 4px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.1s;
+  }
+  .clip-item:hover { border-color: var(--gold); }
+  .clip-item.in-sequence {
+    background: var(--bg);
+    border-color: var(--blood);
+  }
+  .clip-item .ttl {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  .clip-item .cat {
+    color: var(--gold);
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  .seq-item {
+    padding: 8px 10px;
+    margin-bottom: 4px;
+    background: var(--bg-2);
+    border-left: 4px solid var(--blood);
+    cursor: grab;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }
+  .seq-item:active { cursor: grabbing; }
+  .seq-item.dragging { opacity: 0.5; }
+  .seq-item .num {
+    color: var(--gold);
+    font-family: 'Bungee', sans-serif;
+    font-size: 11px;
+    min-width: 20px;
+  }
+  .seq-item .ttl {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .seq-empty {
+    color: var(--ink-dim);
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 12px;
+  }
+
+  /* OUTPUT PLAYER */
+  .output-card {
+    background: var(--bg-3);
+    border: 2px solid var(--gold);
+    border-left-width: 6px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .output-card h4 {
+    font-family: 'Bungee', sans-serif;
+    color: var(--gold);
+    font-size: 13px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .output-text {
+    color: var(--ink);
+    font-style: italic;
+    margin-bottom: 12px;
+    padding: 10px;
+    background: var(--bg);
+    border-left: 3px solid var(--blood);
+  }
+  audio { width: 100%; margin-bottom: 10px; }
+
+  .progress {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    height: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    display: none;
+  }
+  .progress.active { display: block; }
+  .progress-bar {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width 0.2s;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    color: var(--ink-dim);
+    font-size: 11px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .stats-row span { display: inline-block; }
+  .stats-row b { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<script>window.__DUKE_PAGE__ = 'forge';</script>
+
+<div class="wrap">
+
+  <div class="forge-header">
+    <h1 class="forge-title">VOICE FORGE</h1>
+    <div class="forge-tag">TYPE TEXT · STITCH FROM DUKE'S ACTUAL CLIPS · EXPORT AS WAV</div>
+  </div>
+
+  <div class="honesty-box">
+    <strong>HONEST ABOUT WHAT THIS IS:</strong>
+    This is not AI voice cloning. It uses Duke's <em>actual recorded clips</em> as building blocks. Type a phrase — the forge searches the corpus for matches, breaks unmatched text into words, and stitches clips that contain those words. Words not in the library fall back to browser speech synthesis (which is NOT Duke). For exact phrases that exist in the corpus, output is real Duke. For arbitrary text, output quality depends on what's in the library.
+  </div>
+
+  <!-- MODE TABS -->
+  <div class="mode-tabs">
+    <button class="mode-tab active" data-mode="match">⚡ FIND MATCH</button>
+    <button class="mode-tab" data-mode="stitch">🔨 STITCH WORDS</button>
+    <button class="mode-tab" data-mode="builder">🎬 SEQUENCE BUILDER</button>
+    <button class="mode-tab" data-mode="synth">🤖 SYNTH ONLY</button>
+  </div>
+
+  <!-- MATCH MODE -->
+  <div class="mode-panel" id="panel-match">
+    <h3>FIND MATCH</h3>
+    <div class="mode-desc">Search the entire 285-clip library for clips matching your text. Best for finding exact lines or close variants. Real Duke voice when there's a hit.</div>
+    <textarea class="text-input-area" id="matchInput" placeholder='Type a phrase you want Duke to say. Examples: "come get some", "hail to the king", "kick ass and chew bubblegum"'></textarea>
+    <div class="action-row">
+      <button class="big-btn gold" id="matchSearch">⚡ FIND MATCHES</button>
+      <button class="big-btn outline" id="matchClear">CLEAR</button>
+    </div>
+    <div class="results-area" id="matchResults">
+      <div class="results-empty">Matches will appear here. Top results sorted by relevance.</div>
+    </div>
+  </div>
+
+  <!-- STITCH MODE -->
+  <div class="mode-panel" id="panel-stitch" style="display:none;">
+    <h3>STITCH WORDS</h3>
+    <div class="mode-desc">Type text. The forge breaks it into words, finds clips containing each word (using the shortest most-isolated version available), and concatenates them. Missing words fall back to browser speech synthesis. Export the result as a WAV file.</div>
+    <textarea class="text-input-area" id="stitchInput" placeholder='Type any text. Example: "Time to kick ass and take names"'></textarea>
+    <div class="action-row">
+      <button class="big-btn gold" id="stitchAnalyze">🔍 ANALYZE</button>
+      <button class="big-btn" id="stitchBuild" disabled>🔨 BUILD AUDIO</button>
+      <button class="big-btn outline" id="stitchExport" disabled>⬇ EXPORT WAV</button>
+      <button class="big-btn outline" id="stitchClear">CLEAR</button>
+    </div>
+
+    <div id="stitchBreakdown" class="word-breakdown" style="display:none;"></div>
+
+    <div class="output-card" id="stitchOutput" style="display:none;">
+      <h4>FORGED OUTPUT</h4>
+      <div class="output-text" id="stitchOutputText"></div>
+      <audio id="stitchAudio" controls></audio>
+      <div class="stats-row" id="stitchStats"></div>
+    </div>
+  </div>
+
+  <!-- BUILDER MODE -->
+  <div class="mode-panel" id="panel-builder" style="display:none;">
+    <h3>SEQUENCE BUILDER</h3>
+    <div class="mode-desc">Manually arrange clips into a custom phrase. Click clips on the left to add them to your sequence. Drag sequence items to reorder. Play the result, export as WAV.</div>
+    <div class="builder-grid">
+      <div class="builder-section">
+        <h4>CLIP POOL — CLICK TO ADD</h4>
+        <input type="text" class="builder-search" id="poolSearch" placeholder="🔍 Search clips...">
+        <div class="clip-pool" id="clipPool"></div>
+      </div>
+      <div class="builder-section">
+        <h4>YOUR SEQUENCE — DRAG TO REORDER</h4>
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <button class="mini-btn" id="seqClear">CLEAR ALL</button>
+          <button class="mini-btn" id="seqShuffle">SHUFFLE</button>
+        </div>
+        <div class="sequence-list" id="sequenceList">
+          <div class="seq-empty">Click clips on the left to start building.</div>
+        </div>
+      </div>
+    </div>
+    <div class="action-row" style="margin-top:16px;">
+      <button class="big-btn gold" id="builderPlay" disabled>▶ PLAY SEQUENCE</button>
+      <button class="big-btn" id="builderExport" disabled>⬇ EXPORT WAV</button>
+    </div>
+    <div class="output-card" id="builderOutput" style="display:none;">
+      <h4>RENDERED SEQUENCE</h4>
+      <audio id="builderAudio" controls></audio>
+      <div class="stats-row" id="builderStats"></div>
+    </div>
+  </div>
+
+  <!-- SYNTH MODE -->
+  <div class="mode-panel" id="panel-synth" style="display:none;">
+    <h3>SYNTH ONLY (NOT DUKE)</h3>
+    <div class="mode-desc">Browser speech synthesis with pitch/rate tuned to sound somewhat Duke-ish. This is NOT Duke's voice — it's the OS's built-in male voice. Useful as a fallback for words that don't exist anywhere in the corpus, or when you just want quick TTS.</div>
+    <textarea class="text-input-area" id="synthInput" placeholder='Type any text. Browser will speak it via Web Speech API.'></textarea>
+    <div class="action-row">
+      <button class="big-btn gold" id="synthSpeak">🔊 SPEAK</button>
+      <button class="big-btn outline" id="synthStop">⏹ STOP</button>
+    </div>
+    <div style="margin-top:12px; font-size:12px; color:var(--ink-dim);">
+      <strong style="color:var(--gold);">Voice:</strong>
+      <select id="synthVoice" style="background:var(--bg);color:var(--ink);border:1px solid var(--line);padding:6px;font-family:inherit;margin-right:12px;"></select>
+      <strong style="color:var(--gold);">Pitch:</strong>
+      <input type="range" id="synthPitch" min="0.1" max="2" step="0.1" value="0.5" style="vertical-align:middle;">
+      <span id="synthPitchVal">0.5</span>
+      <strong style="color:var(--gold);margin-left:12px;">Rate:</strong>
+      <input type="range" id="synthRate" min="0.5" max="1.5" step="0.05" value="0.85" style="vertical-align:middle;">
+      <span id="synthRateVal">0.85</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/nav.js"></script>
+<script>
+(async function() {
+  // ============ STATE ============
+  let manifest = null;
+  let wordIndex = new Map();   // word -> [{ clip, transcriptLength }]
+  let phraseIndex = [];        // [{ clip, normalized }]
+  let sequence = [];           // builder mode array of clip refs
+  let lastForgedBuffer = null;
+  let lastForgedText = '';
+  let builderRenderedBuffer = null;
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  const toast = document.getElementById('toast');
+  let toastTimer;
+  function flash(msg, ok) {
+    toast.textContent = msg;
+    toast.classList.toggle('success', !!ok);
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+  }
+
+  // ============ LOAD MANIFEST ============
+  try {
+    manifest = await fetch('manifest.json').then(r => r.json());
+  } catch (e) {
+    flash('Manifest unavailable — Voice Forge requires the library');
+    return;
+  }
+
+  // ============ BUILD INDEXES ============
+  function tokenize(text) {
+    return (text || '').toLowerCase().match(/\b[a-z']+\b/gi) || [];
+  }
+  function normalize(text) {
+    return (text || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  manifest.clips.forEach(clip => {
+    const transcript = clip.transcript || clip.title || clip.slug.replace(/-/g, ' ');
+    const norm = normalize(transcript);
+    const words = tokenize(transcript);
+    phraseIndex.push({ clip, normalized: norm, words });
+    words.forEach(w => {
+      if (!wordIndex.has(w)) wordIndex.set(w, []);
+      wordIndex.get(w).push({ clip, transcriptLength: words.length, transcript: norm });
+    });
+  });
+  // Sort each word entry by transcript length ascending so single-word clips win
+  wordIndex.forEach(arr => arr.sort((a, b) => a.transcriptLength - b.transcriptLength));
+
+  // ============ MODE TABS ============
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const mode = tab.dataset.mode;
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      ['match','stitch','builder','synth'].forEach(m => {
+        document.getElementById('panel-' + m).style.display = (m === mode ? 'block' : 'none');
+      });
+    });
+  });
+
+  // ============ FIND MATCH MODE ============
+  function scoreMatch(query, candidate) {
+    const q = normalize(query);
+    const c = candidate.normalized;
+    if (!q || !c) return 0;
+    if (c === q) return 1000;
+    if (c.includes(q)) return 800 - (c.length - q.length);
+    if (q.includes(c)) return 600 - (q.length - c.length);
+    // Word overlap
+    const qWords = new Set(tokenize(q));
+    const overlap = candidate.words.filter(w => qWords.has(w)).length;
+    if (overlap === 0) return 0;
+    const ratio = overlap / Math.max(qWords.size, candidate.words.length);
+    return Math.floor(overlap * 100 + ratio * 200);
+  }
+
+  document.getElementById('matchSearch').addEventListener('click', () => {
+    const query = document.getElementById('matchInput').value.trim();
+    if (!query) { flash('Enter some text to search'); return; }
+    const scored = phraseIndex
+      .map(p => ({ ...p, score: scoreMatch(query, p) }))
+      .filter(p => p.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 25);
+    const cont = document.getElementById('matchResults');
+    if (!scored.length) {
+      cont.innerHTML = `<div class="results-empty">No matches found. Try the STITCH mode for arbitrary text, or simpler keywords.</div>`;
+      return;
+    }
+    cont.innerHTML = scored.map(s => {
+      const c = s.clip;
+      const scoreLabel = s.score >= 800 ? 'EXACT' : s.score >= 500 ? 'CLOSE' : 'PARTIAL';
+      return `<div class="match">
+        <div class="match-score">${scoreLabel}</div>
+        <div class="match-info">
+          <div class="match-title">${escapeHTML(c.title || c.slug)}</div>
+          <div class="match-meta">[${c.category}] · ${c.source} · ${c.filename}</div>
+        </div>
+        <div class="match-actions">
+          <button class="mini-btn primary" data-act="play" data-path="${escapeAttr(c.path)}">▶ PLAY</button>
+          <button class="mini-btn" data-act="dl" data-path="${escapeAttr(c.path)}" data-fname="${escapeAttr(c.filename)}">⬇</button>
+        </div>
+      </div>`;
+    }).join('');
+    cont.querySelectorAll('[data-act="play"]').forEach(b => {
+      b.addEventListener('click', () => {
+        const a = new Audio(b.dataset.path);
+        a.play().catch(e => flash('Play failed: ' + e.message));
+      });
+    });
+    cont.querySelectorAll('[data-act="dl"]').forEach(b => {
+      b.addEventListener('click', () => {
+        const a = document.createElement('a');
+        a.href = b.dataset.path;
+        a.download = b.dataset.fname;
+        document.body.appendChild(a); a.click(); a.remove();
+      });
+    });
+  });
+
+  document.getElementById('matchClear').addEventListener('click', () => {
+    document.getElementById('matchInput').value = '';
+    document.getElementById('matchResults').innerHTML = '<div class="results-empty">Matches will appear here. Top results sorted by relevance.</div>';
+  });
+
+  // ============ STITCH MODE ============
+  let stitchPlan = null;  // current plan: [{type:'clip',clip}|{type:'tts',word}]
+
+  function buildStitchPlan(text) {
+    const words = tokenize(text);
+    return words.map(w => {
+      const matches = wordIndex.get(w);
+      if (matches && matches.length) {
+        return { type: 'clip', word: w, clip: matches[0].clip, source: matches[0].transcript };
+      }
+      return { type: 'tts', word: w };
+    });
+  }
+
+  document.getElementById('stitchAnalyze').addEventListener('click', () => {
+    const text = document.getElementById('stitchInput').value.trim();
+    if (!text) { flash('Enter text to stitch'); return; }
+    stitchPlan = buildStitchPlan(text);
+    const cont = document.getElementById('stitchBreakdown');
+    cont.style.display = 'flex';
+    cont.innerHTML = stitchPlan.map(item => {
+      if (item.type === 'clip') {
+        return `<div class="word-token found">
+          <span class="word">${escapeHTML(item.word)}</span>
+          <span class="source">from: ${escapeHTML(item.source.slice(0, 30))}${item.source.length > 30 ? '...' : ''}</span>
+          <span class="badge">DUKE</span>
+        </div>`;
+      } else {
+        return `<div class="word-token missing">
+          <span class="word">${escapeHTML(item.word)}</span>
+          <span class="source">not in corpus</span>
+          <span class="badge">SYNTH</span>
+        </div>`;
+      }
+    }).join('');
+    document.getElementById('stitchBuild').disabled = false;
+    document.getElementById('stitchExport').disabled = true;
+    document.getElementById('stitchOutput').style.display = 'none';
+    const dukeCount = stitchPlan.filter(x => x.type === 'clip').length;
+    const synthCount = stitchPlan.length - dukeCount;
+    flash(`${dukeCount} Duke clips · ${synthCount} synth fallbacks`, true);
+  });
+
+  async function loadAudioBuffer(path) {
+    const r = await fetch(path);
+    const ab = await r.arrayBuffer();
+    return audioCtx.decodeAudioData(ab.slice(0));  // slice clones, decodeAudioData consumes
+  }
+
+  // Generate a TTS buffer for missing words by playing through OfflineAudioContext
+  // Note: SpeechSynthesis cannot be captured directly. As a workaround we generate
+  // a brief placeholder tone for missing words so the WAV export is complete; live
+  // playback will use real speechSynthesis in parallel.
+  function generatePlaceholderBuffer(durationSec, ctx, sampleRate) {
+    const length = Math.floor(durationSec * sampleRate);
+    const buf = ctx.createBuffer(1, length, sampleRate);
+    const data = buf.getChannelData(0);
+    // Soft white noise burst — signals "this word is missing" without being jarring
+    for (let i = 0; i < length; i++) {
+      const env = Math.sin((i / length) * Math.PI);  // 0 -> 1 -> 0 envelope
+      data[i] = (Math.random() * 2 - 1) * 0.04 * env;
+    }
+    return buf;
+  }
+
+  async function renderStitch(plan) {
+    const SR = 44100;
+    const GAP_SEC = 0.05;
+    const buffers = [];
+    let totalLength = 0;
+    for (const item of plan) {
+      let buf;
+      if (item.type === 'clip') {
+        try {
+          buf = await loadAudioBuffer(item.clip.path);
+        } catch (e) {
+          buf = generatePlaceholderBuffer(0.3, audioCtx, SR);
+        }
+      } else {
+        // Estimate word duration ~0.4s for stitched output
+        buf = generatePlaceholderBuffer(0.35, audioCtx, SR);
+      }
+      buffers.push(buf);
+      totalLength += buf.length + Math.floor(GAP_SEC * (buf.sampleRate || SR));
+    }
+    const offline = new OfflineAudioContext(1, totalLength, SR);
+    let offset = 0;
+    for (const buf of buffers) {
+      const src = offline.createBufferSource();
+      // Convert/resample if needed - mono mix
+      const monoBuf = offline.createBuffer(1, buf.length, SR);
+      const out = monoBuf.getChannelData(0);
+      const inputData = buf.numberOfChannels > 1
+        ? mixToMono(buf)
+        : buf.getChannelData(0);
+      // If sample rates differ, naive resample
+      if (buf.sampleRate !== SR) {
+        const ratio = buf.sampleRate / SR;
+        for (let i = 0; i < monoBuf.length; i++) {
+          const srcIdx = Math.min(Math.floor(i * ratio), inputData.length - 1);
+          out[i] = inputData[srcIdx];
+        }
+      } else {
+        for (let i = 0; i < Math.min(out.length, inputData.length); i++) {
+          out[i] = inputData[i];
+        }
+      }
+      src.buffer = monoBuf;
+      src.connect(offline.destination);
+      src.start(offset / SR);
+      offset += monoBuf.length + Math.floor(GAP_SEC * SR);
+    }
+    return offline.startRendering();
+  }
+
+  function mixToMono(buf) {
+    const len = buf.length;
+    const out = new Float32Array(len);
+    for (let ch = 0; ch < buf.numberOfChannels; ch++) {
+      const data = buf.getChannelData(ch);
+      for (let i = 0; i < len; i++) out[i] += data[i] / buf.numberOfChannels;
+    }
+    return out;
+  }
+
+  document.getElementById('stitchBuild').addEventListener('click', async () => {
+    if (!stitchPlan) return;
+    const buildBtn = document.getElementById('stitchBuild');
+    buildBtn.disabled = true;
+    buildBtn.textContent = '⏳ BUILDING...';
+    try {
+      const renderedBuffer = await renderStitch(stitchPlan);
+      lastForgedBuffer = renderedBuffer;
+      lastForgedText = document.getElementById('stitchInput').value.trim();
+      const wavBlob = audioBufferToWav(renderedBuffer);
+      const url = URL.createObjectURL(wavBlob);
+      document.getElementById('stitchAudio').src = url;
+      document.getElementById('stitchOutputText').textContent = `"${lastForgedText}"`;
+      document.getElementById('stitchOutput').style.display = 'block';
+      const stats = document.getElementById('stitchStats');
+      const dukeCount = stitchPlan.filter(x => x.type === 'clip').length;
+      stats.innerHTML = `
+        <span><b>Duration:</b> ${renderedBuffer.duration.toFixed(2)}s</span>
+        <span><b>Sample rate:</b> ${renderedBuffer.sampleRate} Hz</span>
+        <span><b>Real Duke:</b> ${dukeCount}/${stitchPlan.length} words</span>
+        <span><b>Size:</b> ${(wavBlob.size / 1024).toFixed(1)} KB</span>`;
+      document.getElementById('stitchExport').disabled = false;
+      flash('Audio forged. Press play in the player.', true);
+    } catch (e) {
+      flash('Build failed: ' + e.message);
+      console.error(e);
+    } finally {
+      buildBtn.disabled = false;
+      buildBtn.textContent = '🔨 BUILD AUDIO';
+    }
+  });
+
+  document.getElementById('stitchExport').addEventListener('click', () => {
+    if (!lastForgedBuffer) return;
+    const wavBlob = audioBufferToWav(lastForgedBuffer);
+    const filename = 'duke-' + (lastForgedText.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'forged') + '.wav';
+    const url = URL.createObjectURL(wavBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    flash('WAV exported: ' + filename, true);
+  });
+
+  document.getElementById('stitchClear').addEventListener('click', () => {
+    document.getElementById('stitchInput').value = '';
+    document.getElementById('stitchBreakdown').style.display = 'none';
+    document.getElementById('stitchOutput').style.display = 'none';
+    document.getElementById('stitchBuild').disabled = true;
+    document.getElementById('stitchExport').disabled = true;
+    stitchPlan = null;
+  });
+
+  // ============ BUILDER MODE ============
+  function renderClipPool(filter) {
+    const pool = document.getElementById('clipPool');
+    const f = (filter || '').toLowerCase();
+    let clips = manifest.clips;
+    if (f) {
+      clips = clips.filter(c =>
+        (c.title || '').toLowerCase().includes(f) ||
+        (c.slug || '').toLowerCase().includes(f) ||
+        (c.category || '').toLowerCase().includes(f)
+      );
+    }
+    pool.innerHTML = clips.slice(0, 200).map(c => {
+      const inSeq = sequence.some(s => s.id === c.id);
+      return `<div class="clip-item ${inSeq ? 'in-sequence' : ''}" data-id="${c.id}">
+        <span class="ttl">${escapeHTML(c.title || c.slug)}</span>
+        <span class="cat">${escapeHTML(c.category)}</span>
+      </div>`;
+    }).join('');
+    pool.querySelectorAll('.clip-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const clip = manifest.clips.find(c => c.id === item.dataset.id);
+        if (clip) {
+          sequence.push(clip);
+          renderSequence();
+          renderClipPool(document.getElementById('poolSearch').value);
+        }
+      });
+    });
+  }
+
+  function renderSequence() {
+    const list = document.getElementById('sequenceList');
+    if (!sequence.length) {
+      list.innerHTML = '<div class="seq-empty">Click clips on the left to start building.</div>';
+    } else {
+      list.innerHTML = sequence.map((c, i) => `
+        <div class="seq-item" draggable="true" data-idx="${i}">
+          <span class="num">${i + 1}.</span>
+          <span class="ttl">${escapeHTML(c.title || c.slug)}</span>
+          <button class="mini-btn" data-act="rm" data-idx="${i}">✕</button>
+        </div>`).join('');
+      list.querySelectorAll('[data-act="rm"]').forEach(b => {
+        b.addEventListener('click', e => {
+          e.stopPropagation();
+          sequence.splice(parseInt(b.dataset.idx), 1);
+          renderSequence();
+          renderClipPool(document.getElementById('poolSearch').value);
+        });
+      });
+      // Drag-reorder
+      list.querySelectorAll('.seq-item').forEach(item => {
+        item.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('idx', item.dataset.idx);
+          item.classList.add('dragging');
+        });
+        item.addEventListener('dragend', () => item.classList.remove('dragging'));
+        item.addEventListener('dragover', e => e.preventDefault());
+        item.addEventListener('drop', e => {
+          e.preventDefault();
+          const fromIdx = parseInt(e.dataTransfer.getData('idx'));
+          const toIdx = parseInt(item.dataset.idx);
+          if (fromIdx === toIdx) return;
+          const moved = sequence.splice(fromIdx, 1)[0];
+          sequence.splice(toIdx, 0, moved);
+          renderSequence();
+        });
+      });
+    }
+    document.getElementById('builderPlay').disabled = sequence.length === 0;
+    document.getElementById('builderExport').disabled = sequence.length === 0;
+  }
+
+  document.getElementById('poolSearch').addEventListener('input', e => renderClipPool(e.target.value));
+  document.getElementById('seqClear').addEventListener('click', () => {
+    sequence = []; renderSequence(); renderClipPool(document.getElementById('poolSearch').value);
+  });
+  document.getElementById('seqShuffle').addEventListener('click', () => {
+    sequence.sort(() => Math.random() - 0.5); renderSequence();
+  });
+
+  async function renderSequenceToBuffer() {
+    const SR = 44100;
+    const GAP_SEC = 0.08;
+    const buffers = [];
+    let totalLength = 0;
+    for (const clip of sequence) {
+      const buf = await loadAudioBuffer(clip.path);
+      buffers.push(buf);
+      totalLength += buf.length + Math.floor(GAP_SEC * SR);
+    }
+    const offline = new OfflineAudioContext(1, totalLength, SR);
+    let offset = 0;
+    for (const buf of buffers) {
+      const monoBuf = offline.createBuffer(1, buf.length, SR);
+      const out = monoBuf.getChannelData(0);
+      const inputData = buf.numberOfChannels > 1 ? mixToMono(buf) : buf.getChannelData(0);
+      if (buf.sampleRate !== SR) {
+        const ratio = buf.sampleRate / SR;
+        for (let i = 0; i < monoBuf.length; i++) {
+          const srcIdx = Math.min(Math.floor(i * ratio), inputData.length - 1);
+          out[i] = inputData[srcIdx];
+        }
+      } else {
+        for (let i = 0; i < Math.min(out.length, inputData.length); i++) out[i] = inputData[i];
+      }
+      const src = offline.createBufferSource();
+      src.buffer = monoBuf;
+      src.connect(offline.destination);
+      src.start(offset / SR);
+      offset += monoBuf.length + Math.floor(GAP_SEC * SR);
+    }
+    return offline.startRendering();
+  }
+
+  document.getElementById('builderPlay').addEventListener('click', async () => {
+    if (!sequence.length) return;
+    const btn = document.getElementById('builderPlay');
+    btn.disabled = true; btn.textContent = '⏳ RENDERING...';
+    try {
+      builderRenderedBuffer = await renderSequenceToBuffer();
+      const wav = audioBufferToWav(builderRenderedBuffer);
+      const url = URL.createObjectURL(wav);
+      document.getElementById('builderAudio').src = url;
+      document.getElementById('builderOutput').style.display = 'block';
+      document.getElementById('builderAudio').play();
+      const stats = document.getElementById('builderStats');
+      stats.innerHTML = `
+        <span><b>Clips:</b> ${sequence.length}</span>
+        <span><b>Duration:</b> ${builderRenderedBuffer.duration.toFixed(2)}s</span>
+        <span><b>Size:</b> ${(wav.size / 1024).toFixed(1)} KB</span>`;
+    } catch (e) {
+      flash('Render failed: ' + e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = '▶ PLAY SEQUENCE';
+    }
+  });
+
+  document.getElementById('builderExport').addEventListener('click', async () => {
+    if (!builderRenderedBuffer) {
+      // Render first
+      try {
+        builderRenderedBuffer = await renderSequenceToBuffer();
+      } catch (e) { flash('Render failed: ' + e.message); return; }
+    }
+    const wav = audioBufferToWav(builderRenderedBuffer);
+    const url = URL.createObjectURL(wav);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'duke-sequence-' + Date.now() + '.wav';
+    document.body.appendChild(a); a.click(); a.remove();
+    flash('WAV exported', true);
+  });
+
+  // ============ SYNTH MODE ============
+  const synthVoiceSel = document.getElementById('synthVoice');
+  const synthPitch = document.getElementById('synthPitch');
+  const synthRate = document.getElementById('synthRate');
+  const synthPitchVal = document.getElementById('synthPitchVal');
+  const synthRateVal = document.getElementById('synthRateVal');
+
+  function loadVoices() {
+    const voices = window.speechSynthesis.getVoices();
+    synthVoiceSel.innerHTML = '';
+    const englishMale = voices.filter(v => v.lang.startsWith('en'));
+    englishMale.forEach((v, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `${v.name} (${v.lang})`;
+      // Prefer male-sounding voices
+      if (/daniel|aaron|fred|rocko|ralph|alex|male|david|tom/i.test(v.name)) {
+        opt.selected = true;
+      }
+      synthVoiceSel.appendChild(opt);
+    });
+    synthVoiceSel.dataset.voices = JSON.stringify(englishMale.map(v => v.name));
+  }
+  if ('speechSynthesis' in window) {
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+  }
+
+  synthPitch.addEventListener('input', () => synthPitchVal.textContent = synthPitch.value);
+  synthRate.addEventListener('input', () => synthRateVal.textContent = synthRate.value);
+
+  document.getElementById('synthSpeak').addEventListener('click', () => {
+    const text = document.getElementById('synthInput').value.trim();
+    if (!text) { flash('Enter text to speak'); return; }
+    if (!('speechSynthesis' in window)) { flash('Browser does not support speech synthesis'); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.pitch = parseFloat(synthPitch.value);
+    u.rate = parseFloat(synthRate.value);
+    u.volume = 1.0;
+    const voices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+    const selectedIdx = parseInt(synthVoiceSel.value);
+    if (voices[selectedIdx]) u.voice = voices[selectedIdx];
+    window.speechSynthesis.speak(u);
+  });
+  document.getElementById('synthStop').addEventListener('click', () => {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  });
+
+  // ============ WAV ENCODER ============
+  function audioBufferToWav(buffer) {
+    const numChannels = 1;  // mono output
+    const sampleRate = buffer.sampleRate;
+    const samples = buffer.getChannelData(0);
+    const bytesPerSample = 2;
+    const blockAlign = numChannels * bytesPerSample;
+    const byteRate = sampleRate * blockAlign;
+    const dataSize = samples.length * blockAlign;
+    const bufferSize = 44 + dataSize;
+    const ab = new ArrayBuffer(bufferSize);
+    const view = new DataView(ab);
+    function writeStr(off, str) {
+      for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i));
+    }
+    writeStr(0, 'RIFF');
+    view.setUint32(4, bufferSize - 8, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true);  // PCM chunk size
+    view.setUint16(20, 1, true);   // PCM format
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, byteRate, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, 16, true);  // bits per sample
+    writeStr(36, 'data');
+    view.setUint32(40, dataSize, true);
+    let offset = 44;
+    for (let i = 0; i < samples.length; i++) {
+      const s = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      offset += 2;
+    }
+    return new Blob([ab], { type: 'audio/wav' });
+  }
+
+  // ============ HELPERS ============
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeAttr(s) { return escapeHTML(s); }
+
+  // ============ INIT ============
+  renderClipPool('');
+  flash(`Loaded ${manifest.total} clips · ${wordIndex.size} unique words indexed`, true);
+})();
+</script>
+</body>
+</html>
