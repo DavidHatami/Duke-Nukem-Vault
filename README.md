@@ -1,6 +1,6 @@
 # THE VAULT — Duke Nukem Audio Site
 
-A complete Duke Nukem audio toolkit. Browser-based. No install. **285 voice clips**, a **voice forge** that builds custom phrases from Duke's actual recordings, a **Hell Yeah punch button**, and a **public API** for use in other projects.
+A complete Duke Nukem audio toolkit. Browser-based. No install. **226 voice clips**, a **voice forge** that builds custom phrases from Duke's actual recordings, a **Hell Yeah punch button**, and a **public API** for use in other projects.
 
 ![Static](https://img.shields.io/badge/type-Static_site-141414?style=for-the-badge)
 ![No build](https://img.shields.io/badge/build-None-f4b400?style=for-the-badge)
@@ -14,7 +14,7 @@ A complete Duke Nukem audio toolkit. Browser-based. No install. **285 voice clip
 | Page | What it does | File |
 |------|--------------|------|
 | **HOME** | Landing page, top catchphrases, random picks, links to everything | `index.html` |
-| **LIBRARY** | Full 285-clip browser with search, filter, tags, embed, bulk download | `vault.html` |
+| **LIBRARY** | Full 226-clip browser with search, filter, tags, embed, bulk download | `vault.html` |
 | **VOICE FORGE** | Type text → Duke says it (using his actual clips). Export as WAV | `forge.html` |
 | **PUNCH** | Hell Yeah button. Catharsis with combo counter and screen shake | `punch.html` |
 | **API** | Manifest schema, fetch examples, deep-link URL params | `api.html` |
@@ -33,20 +33,20 @@ Duke-Nukem-Vault/
 │   ├── duke.css        # Shared styling, nav, theme
 │   └── nav.js          # Shared navigation injector
 └── audio/
-    ├── catchphrase/    # 31 — "Come get some", "Hail to the king"
-    ├── combat/         # 50 — kicks, kills, threats
-    ├── damage/         # 12 — pain grunts, death sounds
+    ├── catchphrase/    # 17 — "Come get some", "Hail to the king"
+    ├── combat/         # 42 — kicks, kills, threats
+    ├── damage/         #  9 — pain grunts, death sounds
     ├── french/         # 16 — French-language voice lines
-    ├── general/        # 98 — uncategorized, mixed content
-    ├── greeting/       # 41 — entrances, openers
+    ├── general/        # 81 — uncategorized, mixed content
+    ├── greeting/       # 34 — entrances, openers
     ├── idle/           #  3 — humming, breathing
-    ├── mockery/        #  9 — taunts, insults
-    ├── music/          #  6 — themes, riffs
+    ├── mockery/        #  5 — taunts, insults
+    ├── music/          #  2 — themes, riffs
     ├── reference/      #  6 — pop culture nods
-    └── sexual/         # 13 — strip club, "shake it baby"
+    └── sexual/         # 11 — strip club, "shake it baby"
 ```
 
-**285 audio files. ~10 MB. All MP3. Filenames normalized to lowercase kebab-case.**
+**226 audio files (deduped from 285). ~8.5 MB. All MP3. Filenames normalized to lowercase kebab-case.**
 
 ---
 
@@ -63,13 +63,36 @@ cd Duke-Nukem-Vault
 
 ---
 
+## ELEVENLABS AI VOICE — real Duke text-to-speech
+
+The Voice Forge has an **AI VOICE** mode that calls ElevenLabs through a serverless function. To turn it on:
+
+**1. Get your ElevenLabs API key** at [elevenlabs.io](https://elevenlabs.io) → Profile + API Key. Starts with `sk_`.
+
+**2. Clone Duke's voice (optional but recommended):** ElevenLabs → Voices → Add new voice → Instant Voice Clone. Name it `Duke Nukem`. Upload 5–10 of the cleanest catchphrase clips from this vault as samples (`come-get-some.mp3`, `hail-to-the-king.mp3`, etc.). Submit. ElevenLabs trains in under a minute. Copy the voice ID.
+
+**3. Set Netlify env vars** at Site settings → Environment variables:
+
+```
+ELEVENLABS_API_KEY = sk_your_actual_key_here
+ELEVENLABS_VOICE_ID = your_duke_voice_id   # optional default
+```
+
+Save. Netlify auto-redeploys in ~30 seconds.
+
+**4. Use it.** Open the Voice Forge → AI VOICE tab → status turns gold → pick voice → type → GENERATE.
+
+The function lives at `/.netlify/functions/duke-tts` (POST `{text, voiceId}`) and `/.netlify/functions/duke-voices` (GET, lists your voices). Full docs in [`api.html`](api.html#elevenlabs).
+
+---
+
 ## VOICE FORGE — what it actually does
 
 The honest version: this is **not AI voice cloning**. It's intelligent reuse of Duke's actual recorded clips.
 
 ### Four modes
 
-**1. Find Match** — type a phrase, the forge searches all 285 transcripts for clips that match. Real Duke voice. Best for finding existing lines or close variants.
+**1. Find Match** — type a phrase, the forge searches all 226 transcripts for clips that match. Real Duke voice. Best for finding existing lines or close variants.
 
 **2. Stitch Words** — type any text, the forge breaks it into words, finds the shortest clip containing each word, concatenates them into a single audio output. Words missing from the corpus get a brief placeholder. Export the result as WAV.
 
@@ -139,7 +162,7 @@ The `netlify.toml` adds these clean URLs once deployed:
 
 | Item | Storage | Survives refresh? |
 |------|---------|-------------------|
-| 285 pre-loaded clips | Repo files | Always |
+| 226 pre-loaded clips | Repo files | Always |
 | Renamed clip titles | `localStorage` | Yes (per device) |
 | Custom tags | `localStorage` | Yes (per device) |
 | Voice Forge sequences | Session memory | No — rebuild required |

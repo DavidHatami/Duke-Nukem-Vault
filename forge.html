@@ -422,13 +422,14 @@
     <button class="mode-tab active" data-mode="match">⚡ FIND MATCH</button>
     <button class="mode-tab" data-mode="stitch">🔨 STITCH WORDS</button>
     <button class="mode-tab" data-mode="builder">🎬 SEQUENCE BUILDER</button>
+    <button class="mode-tab" data-mode="ai">🧠 AI VOICE (ELEVENLABS)</button>
     <button class="mode-tab" data-mode="synth">🤖 SYNTH ONLY</button>
   </div>
 
   <!-- MATCH MODE -->
   <div class="mode-panel" id="panel-match">
     <h3>FIND MATCH</h3>
-    <div class="mode-desc">Search the entire 285-clip library for clips matching your text. Best for finding exact lines or close variants. Real Duke voice when there's a hit.</div>
+    <div class="mode-desc">Search the entire 226-clip library for clips matching your text. Best for finding exact lines or close variants. Real Duke voice when there's a hit.</div>
     <textarea class="text-input-area" id="matchInput" placeholder='Type a phrase you want Duke to say. Examples: "come get some", "hail to the king", "kick ass and chew bubblegum"'></textarea>
     <div class="action-row">
       <button class="big-btn gold" id="matchSearch">⚡ FIND MATCHES</button>
@@ -490,6 +491,60 @@
       <h4>RENDERED SEQUENCE</h4>
       <audio id="builderAudio" controls></audio>
       <div class="stats-row" id="builderStats"></div>
+    </div>
+  </div>
+
+  <!-- AI VOICE MODE (ELEVENLABS) -->
+  <div class="mode-panel" id="panel-ai" style="display:none;">
+    <h3>AI VOICE — ELEVENLABS</h3>
+    <div class="mode-desc">Real text-to-speech via ElevenLabs. Type any text, get a clean voice rendering. If you've cloned Duke's voice on ElevenLabs (using clips from this vault as samples), pick that voice from the dropdown to get actual Duke saying anything you type.</div>
+
+    <div id="aiStatus" style="padding:10px 14px; margin-bottom:14px; border-left:4px solid var(--ink-dim); background:var(--bg-3); font-size:12px;">
+      <span id="aiStatusText">Checking ElevenLabs configuration...</span>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px; align-items:flex-end;">
+      <div style="flex:1; min-width:240px;">
+        <label style="display:block; color:var(--gold); font-family:'Bungee',sans-serif; font-size:11px; letter-spacing:1.5px; margin-bottom:6px;">VOICE</label>
+        <select id="aiVoice" style="width:100%; background:var(--bg); color:var(--ink); border:2px solid var(--line); padding:10px; font-family:inherit; font-size:13px;">
+          <option value="">Loading voices...</option>
+        </select>
+      </div>
+      <div>
+        <button class="big-btn outline" id="aiRefreshVoices" style="padding:10px 16px;">↻ REFRESH</button>
+      </div>
+    </div>
+
+    <textarea class="text-input-area" id="aiInput" placeholder='Type any text. Example: "Hail to the king, baby. Time to chew bubblegum and write some AI policy."'></textarea>
+
+    <div style="display:flex; gap:18px; flex-wrap:wrap; margin-bottom:16px; padding:12px; background:var(--bg-3); border:1px solid var(--line);">
+      <div>
+        <label style="color:var(--gold); font-size:11px; font-family:'Bungee',sans-serif;">STABILITY</label>
+        <div><input type="range" id="aiStability" min="0" max="1" step="0.05" value="0.45"> <span id="aiStabilityVal" style="color:var(--ink-dim); font-size:11px;">0.45</span></div>
+      </div>
+      <div>
+        <label style="color:var(--gold); font-size:11px; font-family:'Bungee',sans-serif;">SIMILARITY</label>
+        <div><input type="range" id="aiSimilarity" min="0" max="1" step="0.05" value="0.85"> <span id="aiSimilarityVal" style="color:var(--ink-dim); font-size:11px;">0.85</span></div>
+      </div>
+      <div>
+        <label style="color:var(--gold); font-size:11px; font-family:'Bungee',sans-serif;">STYLE</label>
+        <div><input type="range" id="aiStyle" min="0" max="1" step="0.05" value="0.65"> <span id="aiStyleVal" style="color:var(--ink-dim); font-size:11px;">0.65</span></div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="big-btn gold" id="aiGenerate">🧠 GENERATE</button>
+      <button class="big-btn outline" id="aiClear">CLEAR</button>
+    </div>
+
+    <div class="output-card" id="aiOutput" style="display:none;">
+      <h4>AI-GENERATED OUTPUT</h4>
+      <div class="output-text" id="aiOutputText"></div>
+      <audio id="aiAudio" controls></audio>
+      <div class="action-row" style="margin-top:8px;">
+        <button class="big-btn outline" id="aiDownload">⬇ DOWNLOAD MP3</button>
+      </div>
+      <div class="stats-row" id="aiStats"></div>
     </div>
   </div>
 
@@ -575,7 +630,7 @@
       const mode = tab.dataset.mode;
       document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      ['match','stitch','builder','synth'].forEach(m => {
+      ['match','stitch','builder','ai','synth'].forEach(m => {
         document.getElementById('panel-' + m).style.display = (m === mode ? 'block' : 'none');
       });
     });
@@ -975,6 +1030,174 @@
     a.href = url; a.download = 'duke-sequence-' + Date.now() + '.wav';
     document.body.appendChild(a); a.click(); a.remove();
     flash('WAV exported', true);
+  });
+
+  // ============ AI VOICE MODE (ELEVENLABS) ============
+  const aiVoiceSel = document.getElementById('aiVoice');
+  const aiInput = document.getElementById('aiInput');
+  const aiStability = document.getElementById('aiStability');
+  const aiSimilarity = document.getElementById('aiSimilarity');
+  const aiStyle = document.getElementById('aiStyle');
+  const aiStabilityVal = document.getElementById('aiStabilityVal');
+  const aiSimilarityVal = document.getElementById('aiSimilarityVal');
+  const aiStyleVal = document.getElementById('aiStyleVal');
+  const aiOutput = document.getElementById('aiOutput');
+  const aiOutputText = document.getElementById('aiOutputText');
+  const aiAudio = document.getElementById('aiAudio');
+  const aiStats = document.getElementById('aiStats');
+  const aiStatusText = document.getElementById('aiStatusText');
+  const aiStatusBox = document.getElementById('aiStatus');
+
+  let aiAvailableVoices = [];
+  let aiLastBlob = null;
+  let aiLastText = '';
+
+  // Live slider readouts
+  [['aiStability','aiStabilityVal'],['aiSimilarity','aiSimilarityVal'],['aiStyle','aiStyleVal']].forEach(([s,l]) => {
+    document.getElementById(s).addEventListener('input', e => document.getElementById(l).textContent = e.target.value);
+  });
+
+  function setAiStatus(msg, kind) {
+    aiStatusText.innerHTML = msg;
+    if (kind === 'ok') aiStatusBox.style.borderLeftColor = 'var(--gold)';
+    else if (kind === 'error') aiStatusBox.style.borderLeftColor = 'var(--blood-bright)';
+    else aiStatusBox.style.borderLeftColor = 'var(--ink-dim)';
+  }
+
+  async function loadAiVoices() {
+    setAiStatus('Loading voices from ElevenLabs...');
+    try {
+      const r = await fetch('/.netlify/functions/duke-voices');
+      const data = await r.json();
+      if (!r.ok) {
+        if (r.status === 500 && data.error && data.error.includes('not configured')) {
+          setAiStatus(
+            'ELEVENLABS_API_KEY is not set in Netlify. ' +
+            '<a href="api.html#elevenlabs" style="color:var(--gold);">Setup instructions →</a>',
+            'error'
+          );
+        } else {
+          setAiStatus(`Error: ${data.error || r.status} ${data.detail ? '— ' + JSON.stringify(data.detail).slice(0,200) : ''}`, 'error');
+        }
+        aiVoiceSel.innerHTML = '<option value="">(unavailable)</option>';
+        return;
+      }
+      aiAvailableVoices = data.voices || [];
+      aiVoiceSel.innerHTML = aiAvailableVoices.map(v => {
+        const labelStr = v.labels && Object.keys(v.labels).length
+          ? ' [' + Object.values(v.labels).slice(0,2).join(', ') + ']'
+          : '';
+        return `<option value="${v.voice_id}">${v.name}${labelStr} (${v.category})</option>`;
+      }).join('');
+
+      // Restore previously selected voice
+      const lastVoice = localStorage.getItem('forge_ai_voice');
+      if (lastVoice && aiAvailableVoices.find(v => v.voice_id === lastVoice)) {
+        aiVoiceSel.value = lastVoice;
+      } else {
+        // Auto-select voices that hint at "duke" or custom-cloned
+        const dukeMatch = aiAvailableVoices.find(v => /duke|nukem/i.test(v.name));
+        const cloned = aiAvailableVoices.find(v => v.category === 'cloned');
+        if (dukeMatch) aiVoiceSel.value = dukeMatch.voice_id;
+        else if (cloned) aiVoiceSel.value = cloned.voice_id;
+      }
+
+      setAiStatus(`<strong style="color:var(--gold);">Connected.</strong> ${aiAvailableVoices.length} voices available. Select one and type below.`, 'ok');
+    } catch (err) {
+      setAiStatus(`Connection failed: ${err.message}. The function may not be deployed yet.`, 'error');
+    }
+  }
+
+  aiVoiceSel.addEventListener('change', () => {
+    if (aiVoiceSel.value) localStorage.setItem('forge_ai_voice', aiVoiceSel.value);
+  });
+
+  document.getElementById('aiRefreshVoices').addEventListener('click', loadAiVoices);
+
+  document.getElementById('aiGenerate').addEventListener('click', async () => {
+    const text = aiInput.value.trim();
+    const voiceId = aiVoiceSel.value;
+    if (!text) { flash('Enter text to generate'); return; }
+    if (!voiceId) { flash('Select a voice first'); return; }
+    if (text.length > 5000) { flash('Text too long (5000 char max)'); return; }
+
+    const btn = document.getElementById('aiGenerate');
+    btn.disabled = true;
+    btn.textContent = '⏳ GENERATING...';
+    aiOutput.style.display = 'none';
+
+    try {
+      const startTime = Date.now();
+      const response = await fetch('/.netlify/functions/duke-tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: text,
+          voiceId: voiceId,
+          settings: {
+            stability: parseFloat(aiStability.value),
+            similarity_boost: parseFloat(aiSimilarity.value),
+            style: parseFloat(aiStyle.value),
+            use_speaker_boost: true
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(err.error + (err.detail ? ' — ' + JSON.stringify(err.detail).slice(0,200) : ''));
+      }
+
+      const blob = await response.blob();
+      aiLastBlob = blob;
+      aiLastText = text;
+      const url = URL.createObjectURL(blob);
+      aiAudio.src = url;
+      aiOutputText.textContent = `"${text}"`;
+      aiOutput.style.display = 'block';
+      const voiceName = aiAvailableVoices.find(v => v.voice_id === voiceId)?.name || voiceId;
+      const elapsed = ((Date.now() - startTime)/1000).toFixed(1);
+      aiStats.innerHTML = `
+        <span><b>Voice:</b> ${escapeHTML(voiceName)}</span>
+        <span><b>Size:</b> ${(blob.size / 1024).toFixed(1)} KB</span>
+        <span><b>Generated in:</b> ${elapsed}s</span>
+        <span><b>Characters:</b> ${text.length}</span>`;
+      aiAudio.play().catch(() => {});
+      flash('Generated. Check your output below.', true);
+    } catch (e) {
+      flash('Generation failed: ' + e.message);
+      console.error(e);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🧠 GENERATE';
+    }
+  });
+
+  document.getElementById('aiDownload').addEventListener('click', () => {
+    if (!aiLastBlob) return;
+    const filename = 'duke-ai-' + (aiLastText.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'output') + '.mp3';
+    const url = URL.createObjectURL(aiLastBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
+  document.getElementById('aiClear').addEventListener('click', () => {
+    aiInput.value = '';
+    aiOutput.style.display = 'none';
+    aiLastBlob = null;
+  });
+
+  // Load voices on first switch to AI tab (lazy) — we attach listener to mode tab
+  let aiLoaded = false;
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      if (tab.dataset.mode === 'ai' && !aiLoaded) {
+        aiLoaded = true;
+        loadAiVoices();
+      }
+    });
   });
 
   // ============ SYNTH MODE ============

@@ -3,6 +3,10 @@
 [build]
   publish = "."
   command = ""
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
 
 [[headers]]
   for = "/*"
@@ -46,4 +50,14 @@
 [[redirects]]
   from = "/api"
   to = "/api.html"
+  status = 200
+
+[[redirects]]
+  from = "/tts"
+  to = "/.netlify/functions/duke-tts"
+  status = 200
+
+[[redirects]]
+  from = "/voices"
+  to = "/.netlify/functions/duke-voices"
   status = 200

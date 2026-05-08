@@ -141,7 +141,7 @@
 <div class="code-block">{
   <span class="k">"version"</span>: <span class="t">1</span>,
   <span class="k">"name"</span>: <span class="s">"Duke Nukem Audio Vault"</span>,
-  <span class="k">"total"</span>: <span class="t">285</span>,
+  <span class="k">"total"</span>: <span class="t">226</span>,
   <span class="k">"categories"</span>: [<span class="s">"catchphrase"</span>, <span class="s">"combat"</span>, <span class="s">"damage"</span>, ...],
   <span class="k">"sources"</span>: [<span class="s">"Atomic Soundboard"</span>, <span class="s">"Ultimate Soundboard"</span>, ...],
   <span class="k">"clips"</span>: [
@@ -278,6 +278,70 @@ manifest.clips.forEach(clip =&gt; {
   matches.sort((a, b) =&gt; a.length - b.length);
   <span class="k">return</span> matches[<span class="t">0</span>].clip;
 }</div>
+
+  <h2 id="elevenlabs">ELEVENLABS SETUP — REAL DUKE AI VOICE</h2>
+  <p>The Voice Forge has an <strong style="color:var(--gold);">AI VOICE</strong> mode that uses ElevenLabs for true text-to-speech. To turn it on, set two environment variables in Netlify and you're done.</p>
+
+  <h3>Step 1 — Get your ElevenLabs API key</h3>
+  <p>Sign in at <a href="https://elevenlabs.io" target="_blank" style="color:var(--gold);">elevenlabs.io</a> → click your profile in the top right → <strong>Profile + API Key</strong>. Copy the key (starts with <code>sk_...</code>).</p>
+
+  <h3>Step 2 — (Optional but recommended) Clone Duke's voice</h3>
+  <p>In ElevenLabs:</p>
+  <ol style="margin-left:24px; line-height:1.9; color:var(--ink);">
+    <li>Go to <strong>Voices → Add a new voice → Instant Voice Clone</strong></li>
+    <li>Name it <code>Duke Nukem</code></li>
+    <li>Upload 5–10 of the cleanest catchphrase clips from this vault. Good picks: <code>come-get-some.mp3</code>, <code>hail-to-the-king.mp3</code>, <code>balls-of-steel.mp3</code>, <code>damn-im-good.mp3</code>, <code>kick-ass-and-chew-bubblegum.mp3</code></li>
+    <li>Submit. ElevenLabs trains the voice in 30–60 seconds.</li>
+    <li>Once created, click the voice and copy its <strong>Voice ID</strong> (looks like <code>21m00Tcm4TlvDq8ikWAM</code>)</li>
+  </ol>
+
+  <h3>Step 3 — Set the env vars in Netlify</h3>
+  <p>Go to <a href="https://app.netlify.com/projects/duke-nukem-vault/configuration/env" target="_blank" style="color:var(--gold);">Netlify → Site settings → Environment variables</a> and add:</p>
+
+<div class="code-block"><span class="k">ELEVENLABS_API_KEY</span> = sk_your_actual_key_here
+<span class="k">ELEVENLABS_VOICE_ID</span> = your_duke_voice_id   <span class="c">// optional default</span></div>
+
+  <p>Click <strong>Save</strong>. Netlify will redeploy automatically (~30 seconds). The Voice Forge AI mode will pick it up.</p>
+
+  <h3>Step 4 — Use it</h3>
+  <p>Open <a href="forge.html" style="color:var(--gold);">Voice Forge</a> → click the <strong>🧠 AI VOICE (ELEVENLABS)</strong> tab. The status bar should turn gold and show "Connected." Pick your Duke voice from the dropdown, type any text, hit GENERATE.</p>
+
+  <h3>Endpoints</h3>
+  <table>
+    <thead>
+      <tr><th>Method</th><th>Path</th><th>Body / Effect</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/.netlify/functions/duke-tts</code></td>
+        <td><code>{ text, voiceId, settings? }</code> → returns <code>audio/mpeg</code></td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/.netlify/functions/duke-voices</code></td>
+        <td>Lists voices in your ElevenLabs account</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Use from another project</h3>
+<div class="code-block"><span class="k">const</span> response = <span class="k">await</span> fetch(<span class="s">'https://duke-nukem-vault.netlify.app/.netlify/functions/duke-tts'</span>, {
+  method: <span class="s">'POST'</span>,
+  headers: { <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span> },
+  body: JSON.stringify({
+    text: <span class="s">'Damn, I am good.'</span>,
+    voiceId: <span class="s">'YOUR_DUKE_VOICE_ID'</span>
+  })
+});
+
+<span class="k">const</span> audioBlob = <span class="k">await</span> response.blob();
+<span class="k">const</span> url = URL.createObjectURL(audioBlob);
+<span class="k">new</span> Audio(url).play();</div>
+
+  <div class="note">
+    <strong>NOTE ON RATE LIMITS:</strong> ElevenLabs counts characters against your monthly quota. The free tier is 10,000 chars/month, Starter is 30,000, Creator is 100,000. Each <code>GENERATE</code> click in the Forge spends characters equal to the length of your text.
+  </div>
 
   <h2>RIGHTS</h2>
   <p>Duke Nukem is a registered trademark of Take-Two Interactive. Voice performances by Jon St. John. This API and the underlying audio are intended for personal, non-commercial fan use only. Don't ship a product that monetizes Duke without proper licensing.</p>

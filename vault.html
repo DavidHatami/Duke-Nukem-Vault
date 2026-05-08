@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>THE VAULT — Duke Nukem Audio Repository</title>
-<meta name="description" content="285 Duke Nukem voice clips and sound effects. Browser-based, search, tag, download, embed.">
+<meta name="description" content="226 Duke Nukem voice clips and sound effects. Browser-based, search, tag, download, embed.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=IBM+Plex+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
@@ -903,7 +903,10 @@ fetch('manifest.json')
     playerTitle.textContent = meta.title || clip.title;
     audioEl.style.display = 'none';
     videoEl.style.display = 'none';
-    audioEl.pause(); videoEl.pause();
+    audioEl.pause(); audioEl.currentTime = 0;
+    videoEl.pause(); videoEl.currentTime = 0;
+    audioEl.loop = false;
+    videoEl.loop = false;
     if (clip.type === 'audio') {
       audioEl.src = clip.path;
       audioEl.style.display = 'block';
@@ -1063,8 +1066,17 @@ fetch('manifest.json')
     player.classList.remove('active');
     history.replaceState(null, '', location.pathname);
   });
-  audioEl.addEventListener('ended', () => playRelative(1));
-  videoEl.addEventListener('ended', () => playRelative(1));
+  // No auto-advance — clip plays once and stops. Use NEXT/PREV or arrow keys.
+  audioEl.addEventListener('ended', () => {
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    document.querySelectorAll('.card.playing').forEach(c => c.classList.remove('playing'));
+  });
+  videoEl.addEventListener('ended', () => {
+    videoEl.pause();
+    videoEl.currentTime = 0;
+    document.querySelectorAll('.card.playing').forEach(c => c.classList.remove('playing'));
+  });
 
   // Keyboard shortcuts
   document.addEventListener('keydown', e => {
