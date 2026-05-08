@@ -470,7 +470,7 @@
   <label class="drop" id="dropZone">
     <h2>⬆ DROP MORE FILES OR CLICK TO LOAD</h2>
     <p>MP3 · MP4 · WAV · OGG · WEBM · M4A — multiple files OK (session only)</p>
-    <input type="file" id="fileInput" multiple accept="audio/*,video/*">
+    <input type="file" id="fileInput" multiple accept="clips/*,video/*">
   </label>
 
   <div class="controls">
@@ -677,7 +677,7 @@ fetch('manifest.json')
   function addDroppedFiles(files) {
     let added = 0;
     Array.from(files).forEach(f => {
-      const isAudio = f.type.startsWith('audio/');
+      const isAudio = f.type.startsWith('clips/');
       const isVideo = f.type.startsWith('video/');
       if (!isAudio && !isVideo) return;
       const url = URL.createObjectURL(f);
@@ -689,7 +689,7 @@ fetch('manifest.json')
         category: 'general',
         path: url,
         filename: f.name,
-        type: isAudio ? 'audio' : 'video',
+        type: isAudio ? 'clips' : 'video',
         size: f.size,
         fromManifest: false
       });
@@ -907,7 +907,7 @@ fetch('manifest.json')
     videoEl.pause(); videoEl.currentTime = 0;
     audioEl.loop = false;
     videoEl.loop = false;
-    if (clip.type === 'audio') {
+    if (clip.type === 'clips') {
       audioEl.src = clip.path;
       audioEl.style.display = 'block';
       audioEl.play().catch(e => toast('Playback error: ' + e.message));
@@ -1084,7 +1084,7 @@ fetch('manifest.json')
     if (e.target.matches('input, textarea, [contenteditable="true"]')) return;
     if (e.key === ' ' && currentPlaying) {
       e.preventDefault();
-      const el = currentPlaying.type === 'audio' ? audioEl : videoEl;
+      const el = currentPlaying.type === 'clips' ? audioEl : videoEl;
       if (el.paused) el.play(); else el.pause();
     } else if (e.key === 'ArrowRight') {
       playRelative(1);

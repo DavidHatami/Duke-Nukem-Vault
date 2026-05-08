@@ -1285,7 +1285,7 @@
       view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
       offset += 2;
     }
-    return new Blob([ab], { type: 'audio/wav' });
+    return new Blob([ab], { type: 'clips/wav' });
   }
 
   // ============ HELPERS ============

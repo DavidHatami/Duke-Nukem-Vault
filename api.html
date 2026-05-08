@@ -132,7 +132,7 @@
   <p>The Vault is a static site, but it's fully data-driven. Every clip's path is predictable, every clip's metadata is in <code style="color:var(--blood-bright)">manifest.json</code>, and the vault page itself accepts URL parameters for deep-linking from external apps. This page documents the contract.</p>
 
   <div class="note">
-    <strong>NOTE:</strong> Once deployed to Netlify, replace the local paths below with your live URL (e.g., <code>https://duke-nukem-vault.netlify.app</code>). Netlify is configured with permissive CORS headers on <code>/audio/*</code> and <code>/manifest.json</code>, so you can hotlink directly from any other web project.
+    <strong>NOTE:</strong> Once deployed to Netlify, replace the local paths below with your live URL (e.g., <code>https://duke-nukem-vault.netlify.app</code>). Netlify is configured with permissive CORS headers on <code>/clips/*</code> and <code>/manifest.json</code>, so you can hotlink directly from any other web project.
   </div>
 
   <h2>MANIFEST SCHEMA</h2>
@@ -153,7 +153,7 @@
       <span class="k">"category"</span>: <span class="s">"catchphrase"</span>,    <span class="c">// 11 possible values</span>
       <span class="k">"source"</span>: <span class="s">"Atomic Soundboard"</span>,
       <span class="k">"source_key"</span>: <span class="s">"soundboard_atomic"</span>,
-      <span class="k">"path"</span>: <span class="s">"audio/catchphrase/come-get-some.mp3"</span>,
+      <span class="k">"path"</span>: <span class="s">"clips/catchphrase/come-get-some.mp3"</span>,
       <span class="k">"filename"</span>: <span class="s">"come-get-some.mp3"</span>,
       <span class="k">"type"</span>: <span class="s">"audio"</span>,
       <span class="k">"size"</span>: <span class="t">23436</span>,                <span class="c">// bytes</span>
@@ -196,7 +196,7 @@ button.addEventListener(<span class="s">'click'</span>, () =&gt; {
 }</div>
 
   <h3>Direct embed — no JavaScript</h3>
-<div class="code-block">&lt;audio src=<span class="s">"https://your-vault.netlify.app/audio/catchphrase/come-get-some.mp3"</span> controls&gt;&lt;/audio&gt;</div>
+<div class="code-block">&lt;audio src=<span class="s">"https://your-vault.netlify.app/clips/catchphrase/come-get-some.mp3"</span> controls&gt;&lt;/audio&gt;</div>
 
   <h2>DEEP LINK URL PARAMETERS</h2>
   <p>The library page (<code>vault.html</code>) accepts these query parameters. Useful for opening the vault pre-filtered or auto-playing a specific clip from another app.</p>
@@ -252,7 +252,7 @@ button.addEventListener(<span class="s">'click'</span>, () =&gt; {
   </table>
 
   <h2>FILE PATHS</h2>
-  <p>All audio lives under <code>/audio/&lt;category&gt;/&lt;slug&gt;.mp3</code>. Predictable. URL-safe. Cached at the edge for one year on Netlify (<code>Cache-Control: public, max-age=31536000, immutable</code>).</p>
+  <p>All audio lives under <code>/clips/&lt;category&gt;/&lt;slug&gt;.mp3</code>. Predictable. URL-safe. Cached at the edge for one year on Netlify (<code>Cache-Control: public, max-age=31536000, immutable</code>).</p>
 
   <h2>RATE LIMITS</h2>
   <p>None. It's a static site on Netlify's CDN. Hammer it.</p>

@@ -129,10 +129,10 @@ button.addEventListener('click', () => {
 ### Direct hotlink
 
 ```html
-<audio src="https://your-vault.netlify.app/audio/catchphrase/come-get-some.mp3" controls></audio>
+<audio src="https://your-vault.netlify.app/clips/catchphrase/come-get-some.mp3" controls></audio>
 ```
 
-CORS is wide open on `/audio/*` and `/manifest.json` per `netlify.toml`. Pull from anywhere.
+CORS is wide open on `/clips/*` and `/manifest.json` per `netlify.toml`. Pull from anywhere.
 
 ### Deep-link URL params
 
